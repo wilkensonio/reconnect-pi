@@ -1,0 +1,22 @@
+:root {
+    --background-color: #0051ca;
+    --card-background: rgba(30, 30, 30, 0.541);
+    --text-color: #ffffff;
+    --button-background: #1f6feb;
+    --button-hover: #3a8bfd;
+    --accent-color: #ffffff;
+    --dropdown-background: rgba(30, 30, 30, 0.9);
+    --dropdown-border: #444;
+    --dropdown-hover: #333333;
+  }
+  
+  body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+  }
+  
+  .App {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }

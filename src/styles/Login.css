@@ -1,0 +1,41 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  
+  .login-card {
+    max-width: 400px;
+  }
+  
+  .login-card h2 {
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    color: var(--accent-color);
+  }
+  
+  .login-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .login-card input {
+    padding: 0.8rem 1rem;
+    font-size: 1.1rem;
+    border: 1px solid var(--dropdown-border);
+    border-radius: 8px;
+    background-color: var(--card-background);
+    color: var(--text-color);
+  }
+  
+  .login-card input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+  
+  @media (max-width: 768px) {
+    .login-card {
+      width: 90%;
+    }
+  }
