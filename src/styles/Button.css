@@ -1,0 +1,24 @@
+.button {
+    padding: 1rem 2.5rem;
+    font-size: 1.2rem;
+    color: var(--text-color);
+    background-color: var(--button-background);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 100%;
+  }
+  
+  .button:hover {
+    background-color: var(--button-hover);
+    transform: translateY(-3px);
+  }
+  
+  .button:active {
+    transform: translateY(0);
+  }
+  
+  .back-button {
+    margin-top: 1rem;
+  }

@@ -1,0 +1,83 @@
+.schedule {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.schedule-form {
+  max-width: 600px;
+}
+
+.schedule-form h2 {
+  margin-bottom: 2rem;
+  font-size: 2.5rem;
+  color: var(--accent-color);
+}
+
+.date-picker-container,
+.reason-container {
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.date-picker-container label,
+.reason-container label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+  color: var(--text-color);
+}
+
+/* New styles for the input-dropdown-container */
+.input-dropdown-container {
+  position: relative;
+}
+
+.reason-input {
+  width: 100%;
+  height: 50px;
+  padding: 0.8rem 1rem;
+  font-size: 1.1rem;
+  border: 1px solid var(--dropdown-border);
+  border-radius: 8px;
+  background-color: var(--card-background);
+  color: var(--text-color);
+  resize: vertical;
+}
+
+.predefined-messages {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--dropdown-background);
+  border: 1px solid var(--dropdown-border);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 2;
+}
+
+.predefined-message {
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--text-color);
+}
+
+.predefined-message:hover {
+  background-color: var(--dropdown-hover);
+}
+
+@media (max-width: 768px) {
+  .schedule-form {
+    width: 90%;
+    padding: 2rem 3rem;
+  }
+  
+  .schedule-form h2 {
+    font-size: 2rem;
+  }
+}
