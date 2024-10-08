@@ -1,66 +1,67 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import BackgroundLogos from './BackgroundLogos';
-import Button from './Button';
 import { apiService } from '../services/api';
 import '../styles/ViewMeetings.css';
-import logoSrc from '/rcnnct.png';
 
-/**
- * ViewMeetings component for displaying and managing scheduled meetings
- */
 const ViewMeetings = () => {
   const [meetings, setMeetings] = useState([]);
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchMeetings = async () => {
-      try {
-        console.log('Fetching meetings');
-        const data = await apiService.getAllMeetings();
-        console.log('Fetched meetings:', data);
-        setMeetings(data);
-      } catch (error) {
-        console.error('Error fetching meetings:', error);
-        alert('Failed to fetch meetings. Please try again.');
-      }
-    };
     fetchMeetings();
   }, []);
 
-  /**
-   * Handle cancellation of a meeting
-   * @param {string} id - The ID of the meeting to cancel
-   */
-  const handleCancel = async (id) => {
+  const fetchMeetings = async () => {
     try {
-      console.log('Cancelling meeting:', id);
-      await apiService.deleteMeeting(id);
-      setMeetings(meetings.filter(meeting => meeting.id !== id));
-      console.log('Meeting cancelled successfully');
-      alert('Meeting cancelled successfully');
+      setLoading(true);
+      const response = await apiService.getAllMeetings();
+      setMeetings(response);
+      setLoading(false);
     } catch (error) {
-      console.error('Error cancelling meeting:', error);
-      alert('Failed to cancel meeting. Please try again.');
+      console.error('Error fetching meetings:', error);
+      let errorMessage = 'Failed to fetch meetings. Please try again later.';
+      if (error.message.includes('CORS error')) {
+        errorMessage = 'CORS error: The server is not configured to allow requests from this origin. Please contact the backend team to resolve this issue.';
+      } else if (error.response) {
+        if (error.response.status === 500) {
+          errorMessage = 'Internal Server Error. Please contact the backend team to investigate this issue.';
+        } else if (error.response.status === 404) {
+          errorMessage = 'The meetings endpoint was not found. Please check the API configuration.';
+        } else {
+          errorMessage = `Server responded with error ${error.response.status}: ${error.response.data.detail || error.response.statusText}`;
+        }
+      }
+      setError(errorMessage);
+      setLoading(false);
     }
   };
 
+  if (loading) {
+    return <div>Loading meetings...</div>;
+  }
+
+  if (error) {
+    return <div className="error-message">{error}</div>;
+  }
+
   return (
-    <div className="view-meetings">
-      <BackgroundLogos logoSrc={logoSrc} />
-      <div className="card meetings-list">
-        <h2>View Meetings</h2>
-        {meetings.map((meeting) => (
-          <div key={meeting.id} className="meeting-item">
-            <p>{new Date(meeting.date).toLocaleString()} - {meeting.reason}</p>
-            <Button onClick={() => handleCancel(meeting.id)}>Cancel</Button>
-          </div>
-        ))}
-        <Button onClick={() => {
-          console.log('Navigating back to home');
-          navigate('/');
-        }} className="back-button">Back to Home</Button>
-      </div>
+    <div className="view-meetings-container">
+      <h2>Scheduled Meetings</h2>
+      {meetings.length === 0 ? (
+        <p>No meetings scheduled.</p>
+      ) : (
+        <ul className="meetings-list">
+          {meetings.map((meeting) => (
+            <li key={meeting.id} className="meeting-item">
+              <h3>{meeting.title}</h3>
+              <p>Date: {new Date(meeting.date).toLocaleDateString()}</p>
+              <p>Time: {meeting.time}</p>
+              <p>Location: {meeting.location}</p>
+              <p>Participants: {meeting.participants.join(', ')}</p>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

@@ -1,9 +1,38 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
+const API_URL = import.meta.env.VITE_API_URL || 'http://ec2-3-82-206-23.compute-1.amazonaws.com:8000/api/v1';
+
+console.log('Using API URL:', API_URL);
 
 const api = axios.create({
   baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  },
+});
+
+// Log all requests
+api.interceptors.request.use(request => {
+  console.log('Starting Request', JSON.stringify(request, null, 2));
+  return request;
+});
+
+// Log all responses
+api.interceptors.response.use(response => {
+  console.log('Response:', JSON.stringify(response, null, 2));
+  return response;
+}, error => {
+  console.log('Error:', error);
+  if (error.response) {
+    console.log('Error Data:', error.response.data);
+    console.log('Error Status:', error.response.status);
+    console.log('Error Headers:', error.response.headers);
+  }
+  if (error.message === 'Network Error') {
+    console.log('Possible CORS error. Check if the server is configured to allow CORS.');
+  }
+  return Promise.reject(error);
 });
 
 /**
@@ -26,9 +55,14 @@ export const apiService = {
    */
   async kioskLogin(userId) {
     console.log('Attempting kiosk login for user:', userId);
-    const response = await api.post('/kiosk-signin/', { user_id: userId });
-    console.log('Kiosk login response:', response.data);
-    return response.data;
+    try {
+      const response = await api.post('/kiosk-signin/', { user_id: userId });
+      console.log('Kiosk login response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Kiosk login error:', error);
+      throw error;
+    }
   },
 
   /**
@@ -37,9 +71,17 @@ export const apiService = {
    */
   async getAllMeetings() {
     console.log('Fetching all meetings');
-    const response = await api.get('/meetings/');
-    console.log('Fetched meetings:', response.data);
-    return response.data;
+    try {
+      const response = await api.get('/meetings/');
+      console.log('Fetched meetings:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching meetings:', error);
+      if (error.message === 'Network Error') {
+        throw new Error('CORS error: The server is not configured to allow requests from this origin.');
+      }
+      throw error;
+    }
   },
 
   /**
@@ -49,9 +91,14 @@ export const apiService = {
    */
   async createMeeting(meetingData) {
     console.log('Creating meeting with data:', meetingData);
-    const response = await api.post('/meetings/', meetingData);
-    console.log('Created meeting:', response.data);
-    return response.data;
+    try {
+      const response = await api.post('/meetings/', meetingData);
+      console.log('Created meeting:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating meeting:', error.response ? error.response.data : error.message);
+      throw error;
+    }
   },
 
   /**
@@ -62,9 +109,14 @@ export const apiService = {
    */
   async updateMeeting(id, meetingData) {
     console.log(`Updating meeting ${id} with data:`, meetingData);
-    const response = await api.put(`/meetings/${id}`, meetingData);
-    console.log('Updated meeting:', response.data);
-    return response.data;
+    try {
+      const response = await api.put(`/meetings/${id}`, meetingData);
+      console.log('Updated meeting:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating meeting:', error.response ? error.response.data : error.message);
+      throw error;
+    }
   },
 
   /**
@@ -74,9 +126,14 @@ export const apiService = {
    */
   async deleteMeeting(id) {
     console.log(`Deleting meeting ${id}`);
-    const response = await api.delete(`/meetings/${id}`);
-    console.log('Deletion response:', response.data);
-    return response.data;
+    try {
+      const response = await api.delete(`/meetings/${id}`);
+      console.log('Deletion response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting meeting:', error.response ? error.response.data : error.message);
+      throw error;
+    }
   },
 
   /**
@@ -85,9 +142,14 @@ export const apiService = {
    */
   async getAvailabilities() {
     console.log('Fetching all availabilities');
-    const response = await api.get('/availabilities/');
-    console.log('Fetched availabilities:', response.data);
-    return response.data;
+    try {
+      const response = await api.get('/availabilities/');
+      console.log('Fetched availabilities:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching availabilities:', error.response ? error.response.data : error.message);
+      throw error;
+    }
   },
 };
 
