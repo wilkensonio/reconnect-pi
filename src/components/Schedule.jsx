@@ -99,7 +99,7 @@ const Schedule = () => {
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   onClick={toggleDropdown}
-                  placeholder="Click to select or enter a reason"
+                  placeholder="Click to select a reason"
                   required
                   className="reason-input"
                 />
