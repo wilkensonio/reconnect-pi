@@ -132,7 +132,14 @@
 }
 
 .predefined-messages {
-  display: none; /* Disable the pop-out */
+  display: block; /* Enable the pop-out */
+  max-height: 130px; /* Set a maximum height */
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding: 0.5rem; /* Add some padding */
+  background-color: rgba(8, 35, 153, 0.85); /* Match the background color */
+  border: 1px solid var(--accent-color); /* Add a border */
+  border-radius: 8px; /* Add border radius */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add some shadow for depth */
 }
 
 .predefined-message {
