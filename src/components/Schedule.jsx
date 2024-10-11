@@ -72,56 +72,64 @@ const Schedule = () => {
   return (
     <div className="schedule">
       <BackgroundLogos logoSrc={logoSrc} />
-      <form onSubmit={handleSubmit} className="schedule-form card">
-        <h2>Schedule Meeting</h2>
-        <div className="date-picker-container">
-          <label htmlFor="date-picker">Select Date and Time:</label>
-          <Calendar
-            selectedDate={selectedDate}
-            onSelectDate={(date) => {
-              console.log('Selected date:', date);
-              setSelectedDate(date);
-            }}
-          />
+      <div className="schedule-container">
+        <div className="schedule-card title-card">
+          <h2 className="schedule-title">Schedule Meeting</h2>
         </div>
-        <div className="reason-container">
-          <label htmlFor="reason-input">Reason for Meeting:</label>
-          <div className="input-dropdown-container" ref={dropdownRef}>
-            <input
-              id="reason-input"
-              ref={inputRef}
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              onClick={toggleDropdown}
-              placeholder="Click to select or enter a reason"
-              required
-              className="reason-input"
-            />
-            {isDropdownVisible && (
-              <div className="predefined-messages">
-                {predefinedMessages.map((message, index) => (
-                  <div
-                    key={index}
-                    className="predefined-message"
-                    onClick={() => handlePredefinedMessageClick(message)}
-                    tabIndex="0"
-                    role="option"
-                  >
-                    {message}
-                  </div>
-                ))}
-              </div>
-            )}
+        <form onSubmit={handleSubmit} className="schedule-form">
+          <div className="schedule-card date-picker-card">
+            <div className="date-picker-container">
+              <label htmlFor="date-picker">Select Date and Time:</label>
+              <Calendar
+                selectedDate={selectedDate}
+                onSelectDate={(date) => {
+                  console.log('Selected date:', date);
+                  setSelectedDate(date);
+                }}
+              />
+            </div>
           </div>
-        </div>
-        <div className="button-container">
-          <Button type="submit">Schedule Meeting</Button>
-          <Button onClick={() => {
-            console.log('Navigating back to home');
-            navigate('/');
-          }} className="back-button">Back to Home</Button>
-        </div>
-      </form>
+          <div className="schedule-card reason-card">
+            <div className="reason-container">
+              <label htmlFor="reason-input">Reason for Meeting:</label>
+              <div className="input-dropdown-container" ref={dropdownRef}>
+                <input
+                  id="reason-input"
+                  ref={inputRef}
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  onClick={toggleDropdown}
+                  placeholder="Click to select or enter a reason"
+                  required
+                  className="reason-input"
+                />
+                {isDropdownVisible && (
+                  <div className="predefined-messages">
+                    {predefinedMessages.map((message, index) => (
+                      <div
+                        key={index}
+                        className="predefined-message"
+                        onClick={() => handlePredefinedMessageClick(message)}
+                        tabIndex="0"
+                        role="option"
+                      >
+                        {message}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="button-container">
+              <Button type="submit" className="full-width-button large-button">Schedule Meeting</Button>
+              <Button onClick={() => {
+                console.log('Navigating back to home');
+                navigate('/');
+              }} className="full-width-button large-button back-button">Back to Home</Button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

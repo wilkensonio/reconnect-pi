@@ -4,12 +4,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import { apiService } from '../services/api';
 import '../styles/Calendar.css';
 
-/**
- * Calendar component for date and time selection
- * @param {Object} props - The component props
- * @param {Date} props.selectedDate - The currently selected date
- * @param {Function} props.onSelectDate - Callback function when a date is selected
- */
 const Calendar = ({ selectedDate, onSelectDate }) => {
   const [availableDates, setAvailableDates] = useState([]);
 
@@ -26,13 +20,8 @@ const Calendar = ({ selectedDate, onSelectDate }) => {
     fetchAvailabilities();
   }, []);
 
-  /**
-   * Check if a given date is available
-   * @param {Date} date - The date to check
-   * @returns {boolean} Whether the date is available
-   */
   const isDateAvailable = (date) => {
-    return availableDates.some(availableDate => 
+    return availableDates.some(availableDate =>
       date.getDate() === availableDate.getDate() &&
       date.getMonth() === availableDate.getMonth() &&
       date.getFullYear() === availableDate.getFullYear()

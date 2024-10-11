@@ -2,12 +2,12 @@
     --background-color: #0051ca;
     --card-background: rgba(30, 30, 30, 0.541);
     --text-color: #ffffff;
-    --button-background: #1f6feb;
+    --button-background: #1f71eb;
     --button-hover: #3a8bfd;
     --accent-color: #ffffff;
-    --dropdown-background: rgba(30, 30, 30, 0.9);
+    --dropdown-background: rgba(10, 18, 90, 0.9);
     --dropdown-border: #444;
-    --dropdown-hover: #333333;
+    --dropdown-hover: #140c88;
   }
   
   body {
