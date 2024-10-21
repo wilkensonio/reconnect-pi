@@ -116,7 +116,7 @@
 }
 
 .unavailable-date {
-  background-color: transparent;
+  background-color: #0a0c99;
   color: #721c24; 
   opacity: 1; 
   border-radius: 50%;
@@ -134,5 +134,5 @@
 }
 
 .transparent-card {
-  background-color: rgba(255, 255, 255, 0.5); /* Semi-transparent white background */
+  background-color: transparent; /* Semi-transparent white background */
 }

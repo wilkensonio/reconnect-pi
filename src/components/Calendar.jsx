@@ -40,22 +40,10 @@ const Calendar = ({ selectedDate, onSelectDate }) => {
     );
   };
 
-  const handleDayClick = (date) => {
-    const parentElement = document.querySelector('.schedule-card');
-    if (!isDateAvailable(date)) {
-      parentElement.classList.add('transparent-card');
-    } else {
-      parentElement.classList.remove('transparent-card');
-    }
-  };
-
   return (
     <DatePicker
       selected={selectedDate}
-      onChange={(date) => {
-        onSelectDate(date);
-        handleDayClick(date);
-      }}
+      onChange={onSelectDate}
       showTimeSelect
       inline
       timeFormat="HH:mm"

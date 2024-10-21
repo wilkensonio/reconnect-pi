@@ -68,6 +68,16 @@ export const apiService = {
     }
   },
 
+  async getFacultyInfo(facultyId) {
+    try {
+      const response = await api.get(`/user/id/${facultyId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching faculty info:', error);
+      throw error;
+    }
+  },
+
   async getAppointmentById(appointmentId) {
     try {
       const response = await api.get(`/appointment/get-by-id/${appointmentId}`);

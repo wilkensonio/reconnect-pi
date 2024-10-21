@@ -14,7 +14,7 @@ const ViewAppointments = () => {
   const { user } = useAppContext();
 
   useEffect(() => {
-    const fetchAppointments = async () => {
+    const fetchAppointmentsAndFacultyInfo = async () => {
       if (!user || !user.student_id) {
         setError('User information is missing. Please log in again.');
         setLoading(false);
@@ -24,7 +24,26 @@ const ViewAppointments = () => {
       try {
         setLoading(true);
         const response = await apiService.getStudentAppointments(user.student_id);
-        setAppointments(response);
+        
+        const appointmentsWithFacultyNames = await Promise.all(
+          response.map(async (appointment) => {
+            try {
+              const facultyInfo = await apiService.getFacultyInfo(appointment.faculty_id);
+              return {
+                ...appointment,
+                facultyName: `${facultyInfo.last_name}`
+              };
+            } catch (error) {
+              console.error(`Error fetching faculty info for ID ${appointment.faculty_id}:`, error);
+              return {
+                ...appointment,
+                facultyName: 'Unknown'
+              };
+            }
+          })
+        );
+
+        setAppointments(appointmentsWithFacultyNames);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching appointments:', error);
@@ -33,7 +52,7 @@ const ViewAppointments = () => {
       }
     };
 
-    fetchAppointments();
+    fetchAppointmentsAndFacultyInfo();
   }, [user]);
 
   const handleDeleteAppointment = async (appointmentId) => {
@@ -64,10 +83,9 @@ const ViewAppointments = () => {
           {appointments.map((appointment) => (
             <li key={appointment.id} className="appointment-item">
               <h3>{appointment.reason}</h3>
-              <p>Date: {new Date(appointment.date).toLocaleDateString()}</p>
-              <p>Time: {appointment.start_time} - {appointment.end_time}</p>
-              <p>Faculty: {appointment.faculty_id}</p>
-              <p>Reason: {appointment.reason}</p>
+              <p><strong>Date:</strong> {new Date(appointment.date).toLocaleDateString()}</p>
+              <p><strong>Time:</strong> {appointment.start_time} - {appointment.end_time}</p>
+              <p><strong>Faculty:</strong> {appointment.facultyName}</p>
               <Button onClick={() => handleDeleteAppointment(appointment.id)} className="cancel-button">
                 Cancel Appointment
               </Button>
