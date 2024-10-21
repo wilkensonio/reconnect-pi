@@ -21,7 +21,19 @@ const Login = () => {
       console.log('Attempting login with user ID:', userId);
       const response = await apiService.kioskLogin(userId);
       console.log('Login successful, response:', response);
-      setUser(response);
+      
+      // Store the token
+      localStorage.setItem('reconnect_access_token', response.access_token);
+      
+      // Set user in context
+      setUser({
+        id: response.id,
+        student_id: response.student_id,
+        first_name: response.first_name,
+        last_name: response.last_name,
+        email: response.email,
+      });
+
       const from = location.state?.from || '/';
       console.log('Navigating to:', from);
       navigate(from, { replace: true });

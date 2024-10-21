@@ -1,43 +1,53 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { apiService } from '../services/api';
+import { useAppContext } from '../context/AppContext';
+import Button from './Button';
 import '../styles/ViewMeetings.css';
+import LogoutButton from './LogoutButton';
 
-const ViewMeetings = () => {
-  const [meetings, setMeetings] = useState([]);
+const ViewAppointments = () => {
+  const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const { user } = useAppContext();
 
   useEffect(() => {
-    fetchMeetings();
-  }, []);
-
-  const fetchMeetings = async () => {
-    try {
-      setLoading(true);
-      const response = await apiService.getAllMeetings();
-      setMeetings(response);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching meetings:', error);
-      let errorMessage = 'Failed to fetch meetings. Please try again later.';
-      if (error.message.includes('CORS error')) {
-        errorMessage = 'CORS error: The server is not configured to allow requests from this origin. Please contact the backend team to resolve this issue.';
-      } else if (error.response) {
-        if (error.response.status === 500) {
-          errorMessage = 'Internal Server Error. Please contact the backend team to investigate this issue.';
-        } else if (error.response.status === 404) {
-          errorMessage = 'The meetings endpoint was not found. Please check the API configuration.';
-        } else {
-          errorMessage = `Server responded with error ${error.response.status}: ${error.response.data.detail || error.response.statusText}`;
-        }
+    const fetchAppointments = async () => {
+      if (!user || !user.student_id) {
+        setError('User information is missing. Please log in again.');
+        setLoading(false);
+        return;
       }
-      setError(errorMessage);
-      setLoading(false);
+
+      try {
+        setLoading(true);
+        const response = await apiService.getStudentAppointments(user.student_id);
+        setAppointments(response);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching appointments:', error);
+        setError('Failed to fetch appointments. Please try again later.');
+        setLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, [user]);
+
+  const handleDeleteAppointment = async (appointmentId) => {
+    try {
+      await apiService.deleteAppointment(appointmentId);
+      setAppointments(appointments.filter(app => app.id !== appointmentId));
+    } catch (error) {
+      console.error('Error deleting appointment:', error);
+      alert('Failed to delete appointment. Please try again.');
     }
   };
 
   if (loading) {
-    return <div>Loading meetings...</div>;
+    return <div>Loading appointments...</div>;
   }
 
   if (error) {
@@ -45,25 +55,30 @@ const ViewMeetings = () => {
   }
 
   return (
-    <div className="view-meetings-container">
-      <h2>Scheduled Meetings</h2>
-      {meetings.length === 0 ? (
-        <p>No meetings scheduled.</p>
+    <div className="view-appointments-container">
+      <h2>Your Scheduled Appointments</h2>
+      {appointments.length === 0 ? (
+        <p>No appointments scheduled.</p>
       ) : (
-        <ul className="meetings-list">
-          {meetings.map((meeting) => (
-            <li key={meeting.id} className="meeting-item">
-              <h3>{meeting.title}</h3>
-              <p>Date: {new Date(meeting.date).toLocaleDateString()}</p>
-              <p>Time: {meeting.time}</p>
-              <p>Location: {meeting.location}</p>
-              <p>Participants: {meeting.participants.join(', ')}</p>
+        <ul className="appointments-list">
+          {appointments.map((appointment) => (
+            <li key={appointment.id} className="appointment-item">
+              <h3>{appointment.reason}</h3>
+              <p>Date: {new Date(appointment.date).toLocaleDateString()}</p>
+              <p>Time: {appointment.start_time} - {appointment.end_time}</p>
+              <p>Faculty: {appointment.faculty_id}</p>
+              <p>Reason: {appointment.reason}</p>
+              <Button onClick={() => handleDeleteAppointment(appointment.id)} className="cancel-button">
+                Cancel Appointment
+              </Button>
             </li>
           ))}
         </ul>
       )}
+      <Button onClick={() => navigate('/')} className="back-button">Back to Home</Button>
+      <LogoutButton />
     </div>
   );
 };
 
-export default ViewMeetings;
+export default ViewAppointments;

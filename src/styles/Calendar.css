@@ -83,13 +83,13 @@
 }
 
 .custom-calendar .available-date {
-  background-color: #4caf50;
+  background-color: #56c4e6;
   color: white;
   border-radius: 50%;
 }
 
 .custom-calendar .unavailable-date {
-  color: #ccc;
+  color: #f8f7f7;
 }
 
 .custom-calendar .react-datepicker__time-container {
@@ -108,4 +108,31 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.available-date {
+  background-color: #56c4e6; 
+  color: #2528be; 
+}
+
+.unavailable-date {
+  background-color: transparent;
+  color: #721c24; 
+  opacity: 1; 
+  border-radius: 50%;
+}
+
+.available-time {
+  background-color: #56c4e6; 
+  color: #2528be; 
+}
+
+.unavailable-time {
+  background-color: #0a0c99; 
+  color: #721c24; 
+  opacity: 1; 
+}
+
+.transparent-card {
+  background-color: rgba(255, 255, 255, 0.5); /* Semi-transparent white background */
 }

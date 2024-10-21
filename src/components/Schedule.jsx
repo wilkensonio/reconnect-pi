@@ -4,6 +4,7 @@ import Calendar from './Calendar';
 import BackgroundLogos from './BackgroundLogos';
 import Button from './Button';
 import { apiService } from '../services/api';
+import { useAppContext } from '../context/AppContext';
 import '../styles/Schedule.css';
 import logoSrc from '/rcnnct.png';
 
@@ -27,6 +28,7 @@ const Schedule = () => {
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
   const inputRef = useRef(null);
+  const { user } = useAppContext();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -46,10 +48,15 @@ const Schedule = () => {
     e.preventDefault();
     try {
       console.log('Scheduling meeting:', { date: selectedDate, reason });
-      await apiService.createMeeting({
-        date: selectedDate.toISOString(),
-        reason
-      });
+      const appointmentData = {
+        date: selectedDate.toISOString().split('T')[0],
+        start_time: selectedDate.toTimeString().slice(0, 5),
+        end_time: new Date(selectedDate.getTime() + 45 * 60000).toTimeString().slice(0, 5),
+        reason,
+        student_id: user?.student_id,
+        faculty_id: "70578617" // This should be dynamically set based on faculty member
+      };
+      await apiService.createAppointment(appointmentData);
       console.log('Meeting scheduled successfully');
       alert('Meeting scheduled successfully');
       navigate('/view');
@@ -122,10 +129,7 @@ const Schedule = () => {
             </div>
             <div className="button-container">
               <Button type="submit" className="full-width-button large-button">Schedule Meeting</Button>
-              <Button onClick={() => {
-                console.log('Navigating back to home');
-                navigate('/');
-              }} className="full-width-button large-button back-button">Back to Home</Button>
+              <Button onClick={() => navigate('/')} className="full-width-button large-button back-button">Back to Home</Button>
             </div>
           </div>
         </form>

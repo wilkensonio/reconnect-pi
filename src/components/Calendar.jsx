@@ -5,13 +5,18 @@ import { apiService } from '../services/api';
 import '../styles/Calendar.css';
 
 const Calendar = ({ selectedDate, onSelectDate }) => {
-  const [availableDates, setAvailableDates] = useState([]);
+  const [availableTimes, setAvailableTimes] = useState([]);
 
   useEffect(() => {
     const fetchAvailabilities = async () => {
       try {
         const availabilities = await apiService.getAvailabilities();
-        setAvailableDates(availabilities.map(a => new Date(a.day)));
+        const times = availabilities.map(a => ({
+          day: a.day,
+          start_time: a.start_time,
+          end_time: a.end_time
+        }));
+        setAvailableTimes(times);
         console.log('Fetched availabilities:', availabilities);
       } catch (error) {
         console.error('Error fetching availabilities:', error);
@@ -21,17 +26,36 @@ const Calendar = ({ selectedDate, onSelectDate }) => {
   }, []);
 
   const isDateAvailable = (date) => {
-    return availableDates.some(availableDate =>
-      date.getDate() === availableDate.getDate() &&
-      date.getMonth() === availableDate.getMonth() &&
-      date.getFullYear() === availableDate.getFullYear()
+    const dayOfWeek = date.toLocaleString('en-US', { weekday: 'long' });
+    return availableTimes.some(slot => dayOfWeek === slot.day);
+  };
+
+  const isTimeAvailable = (time) => {
+    const dayOfWeek = time.toLocaleString('en-US', { weekday: 'long' });
+    const selectedTimeString = time.toTimeString().slice(0, 5);
+    return availableTimes.some(slot =>
+      dayOfWeek === slot.day &&
+      selectedTimeString >= slot.start_time &&
+      selectedTimeString < slot.end_time
     );
+  };
+
+  const handleDayClick = (date) => {
+    const parentElement = document.querySelector('.schedule-card');
+    if (!isDateAvailable(date)) {
+      parentElement.classList.add('transparent-card');
+    } else {
+      parentElement.classList.remove('transparent-card');
+    }
   };
 
   return (
     <DatePicker
       selected={selectedDate}
-      onChange={onSelectDate}
+      onChange={(date) => {
+        onSelectDate(date);
+        handleDayClick(date);
+      }}
       showTimeSelect
       inline
       timeFormat="HH:mm"
@@ -39,6 +63,7 @@ const Calendar = ({ selectedDate, onSelectDate }) => {
       dateFormat="MMMM d, yyyy h:mm aa"
       calendarClassName="custom-calendar"
       dayClassName={date => isDateAvailable(date) ? "available-date" : "unavailable-date"}
+      timeClassName={time => isTimeAvailable(time) ? "available-time" : "unavailable-time"}
       popperPlacement="bottom-start"
       popperModifiers={[
         {

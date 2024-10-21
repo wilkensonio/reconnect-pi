@@ -2,28 +2,16 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import BackgroundLogos from './BackgroundLogos';
 import Button from './Button';
-import { useAppContext } from '../context/AppContext';
 import '../styles/Home.css';
 import logoSrc from '/rcnnct.png';
+import LogoutButton from './LogoutButton';
 
-/**
- * Home component displaying the main menu
- */
+
 const Home = () => {
   const navigate = useNavigate();
-  const { user } = useAppContext();
 
-  /**
-   * Handle navigation to different pages
-   * @param {string} path - The path to navigate to
-   */
   const handleNavigation = (path) => {
-    if (user) {
-      navigate(path);
-    } else {
-      navigate('/login', { state: { from: path } });
-    }
-    console.log(`Navigating to: ${path}`);
+    navigate(path);
   };
 
   return (
@@ -41,6 +29,7 @@ const Home = () => {
           <Button onClick={() => handleNavigation('/view')}>
             Cancel Meeting
           </Button>
+          <LogoutButton/>
         </div>
       </div>
     </div>
