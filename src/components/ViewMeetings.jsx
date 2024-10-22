@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { apiService } from '../services/api';
 import { useAppContext } from '../context/AppContext';
 import Button from './Button';
-import '../styles/ViewMeetings.css';
+import BackgroundLogos from './BackgroundLogos';
 import LogoutButton from './LogoutButton';
+import '../styles/ViewMeetings.css';
+import logoSrc from '/rcnnct.png';
 
-const ViewAppointments = () => {
+const ViewMeetings = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,89 +16,138 @@ const ViewAppointments = () => {
   const { user } = useAppContext();
 
   useEffect(() => {
-    const fetchAppointmentsAndFacultyInfo = async () => {
-      if (!user || !user.student_id) {
-        setError('User information is missing. Please log in again.');
+    const fetchAppointments = async () => {
+      if (!user?.student_id) {
+        setError('Please log in again');
         setLoading(false);
         return;
       }
 
       try {
-        setLoading(true);
         const response = await apiService.getStudentAppointments(user.student_id);
-        
-        const appointmentsWithFacultyNames = await Promise.all(
+        const appointmentsWithDetails = await Promise.all(
           response.map(async (appointment) => {
             try {
               const facultyInfo = await apiService.getFacultyInfo(appointment.faculty_id);
               return {
                 ...appointment,
-                facultyName: `${facultyInfo.last_name}`
+                facultyName: `Prof. ${facultyInfo.last_name}`
               };
             } catch (error) {
-              console.error(`Error fetching faculty info for ID ${appointment.faculty_id}:`, error);
+              console.error(`Error fetching faculty info: ${error}`);
               return {
                 ...appointment,
-                facultyName: 'Unknown'
+                facultyName: 'Unknown Faculty'
               };
             }
           })
         );
 
-        setAppointments(appointmentsWithFacultyNames);
+        // Sort appointments by date and time
+        const sortedAppointments = appointmentsWithDetails.sort((a, b) => {
+          const dateA = new Date(`${a.date} ${a.start_time}`);
+          const dateB = new Date(`${b.date} ${b.start_time}`);
+          return dateA - dateB;
+        });
+
+        setAppointments(sortedAppointments);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching appointments:', error);
-        setError('Failed to fetch appointments. Please try again later.');
+        setError('Failed to load appointments');
         setLoading(false);
       }
     };
 
-    fetchAppointmentsAndFacultyInfo();
+    fetchAppointments();
   }, [user]);
 
   const handleDeleteAppointment = async (appointmentId) => {
-    try {
-      await apiService.deleteAppointment(appointmentId);
-      setAppointments(appointments.filter(app => app.id !== appointmentId));
-    } catch (error) {
-      console.error('Error deleting appointment:', error);
-      alert('Failed to delete appointment. Please try again.');
+    if (window.confirm('Are you sure you want to cancel this appointment?')) {
+      try {
+        await apiService.deleteAppointment(appointmentId);
+        setAppointments(appointments.filter(app => app.id !== appointmentId));
+      } catch (error) {
+        console.error('Error canceling appointment:', error);
+        alert('Failed to cancel appointment. Please try again.');
+      }
     }
   };
 
   if (loading) {
-    return <div>Loading appointments...</div>;
-  }
-
-  if (error) {
-    return <div className="error-message">{error}</div>;
+    return (
+      <div className="view-meetings">
+        <BackgroundLogos logoSrc={logoSrc} />
+        <div className="meetings-container">
+          <div className="meetings-card loading-container">
+            <div className="loading-spinner"></div>
+            <p>Loading your appointments...</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="view-appointments-container">
-      <h2>Your Scheduled Appointments</h2>
-      {appointments.length === 0 ? (
-        <p>No appointments scheduled.</p>
-      ) : (
-        <ul className="appointments-list">
-          {appointments.map((appointment) => (
-            <li key={appointment.id} className="appointment-item">
-              <h3>{appointment.reason}</h3>
-              <p><strong>Date:</strong> {new Date(appointment.date).toLocaleDateString()}</p>
-              <p><strong>Time:</strong> {appointment.start_time} - {appointment.end_time}</p>
-              <p><strong>Faculty:</strong> {appointment.facultyName}</p>
-              <Button onClick={() => handleDeleteAppointment(appointment.id)} className="cancel-button">
-                Cancel Appointment
-              </Button>
-            </li>
-          ))}
-        </ul>
-      )}
-      <Button onClick={() => navigate('/')} className="back-button">Back to Home</Button>
-      <LogoutButton />
+    <div className="view-meetings">
+      <BackgroundLogos logoSrc={logoSrc} />
+      <div className="meetings-container">
+        <div className="meetings-card">
+          <h2>Your Meetings</h2>
+          
+          {error ? (
+            <div className="error-message">{error}</div>
+          ) : appointments.length === 0 ? (
+            <div className="no-appointments">
+              <p>No appointments scheduled</p>
+            </div>
+          ) : (
+            <div className="appointments-list">
+              {appointments.map((appointment) => (
+                <div key={appointment.id} className="appointment-item">
+                  <div className="appointment-header">
+                    <h3>{appointment.facultyName}</h3>
+                    <Button
+                      onClick={() => handleDeleteAppointment(appointment.id)}
+                      className="cancel-button"
+                    >
+                      Cancel Meeting
+                    </Button>
+                  </div>
+                  <div className="appointment-details">
+                    <p>
+                      <strong>Date:</strong> {new Date(appointment.date).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </p>
+                    <p>
+                      <strong>Time:</strong> {appointment.start_time} - {appointment.end_time}
+                    </p>
+                    <p>
+                      <strong>Reason:</strong> {appointment.reason}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          <div className="button-container">
+            <Button
+              onClick={() => navigate('/home')}
+              className="back-button"
+            >
+              Back to Home
+            </Button>
+            <LogoutButton />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default ViewAppointments;
+export default ViewMeetings;

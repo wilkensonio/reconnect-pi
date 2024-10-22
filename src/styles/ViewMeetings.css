@@ -1,54 +1,237 @@
 .view-meetings {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100vw;
+  position: relative;
+}
+
+.meetings-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 1400px;
+  padding: 2rem;
+  margin: 2rem;
+}
+
+.meetings-card {
+  background-color: rgba(8, 35, 153, 0.849);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  border: 3px solid var(--accent-color);
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.meetings-card h2 {
+  color: white;
+  text-align: center;
+  font-size: 3.5rem;
+  margin: 0 0 1.5rem 0;
+  text-shadow:
+    -1px -1px 0 navy,
+    1px -1px 0 navy,
+    -1px 1px 0 navy,
+    1px 1px 0 navy;
+}
+
+.appointments-list {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 1rem;
+  margin-bottom: 1.5rem;
+  max-height: calc(85vh - 200px); /* Adjust based on header and button heights */
+  /* Scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+/* Webkit scrollbar styling */
+.appointments-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.appointments-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.appointments-list::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.appointment-item {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.appointment-item:hover {
+  transform: translateY(-2px);
+}
+
+.appointment-item:last-child {
+  margin-bottom: 0;
+}
+
+.appointment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.appointment-header h3 {
+  color: white;
+  margin: 0;
+  font-size: 1.4rem;
+  text-shadow:
+    -1px -1px 0 navy,
+    1px -1px 0 navy,
+    -1px 1px 0 navy,
+    1px 1px 0 navy;
+}
+
+.appointment-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.appointment-details p {
+  color: white;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.appointment-details strong {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.cancel-button {
+  background-color: rgba(239, 68, 68, 0.8);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  border: 1px solid rgba(239, 68, 68, 0.9);
+  text-shadow:
+    -1px -1px 0 rgb(153, 27, 27),
+    1px -1px 0 rgb(153, 27, 27),
+    -1px 1px 0 rgb(153, 27, 27),
+    1px 1px 0 rgb(153, 27, 27);
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.cancel-button:hover {
+  background-color: rgba(239, 68, 68, 0.9);
+  transform: translateY(-1px);
+}
+
+.button-container {
+  display: flex;
+  gap: 1rem;
+  padding: 0 1rem;
+  margin-top: auto;
+}
+
+.button-container button {
+  flex: 1;
+  font-size: 1.3rem;
+  padding: 1rem;
+  color: white;
+  background-color: rgba(59, 131, 246, 0.959);
+  border: 1px solid navy;
+  border-radius: 8px;
+  text-shadow:
+    -1px -1px 0 navy,
+    1px -1px 0 navy,
+    -1px 1px 0 navy,
+    1px 1px 0 navy;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.button-container button:hover {
+  background-color: rgba(59, 130, 246, 1);
+  transform: translateY(-2px);
+}
+
+.no-appointments {
+  text-align: center;
+  color: white;
+  font-size: 1.2rem;
+  padding: 2rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: white;
+}
+
+.loading-spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top: 4px solid white;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 1rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Specific adjustments for 10.1-inch screen */
+@media screen and (max-width: 1024px) {
+  .meetings-container {
+    padding: 1.5rem;
+    margin: 1.5rem;
   }
-  
-  .meetings-list {
-    max-width: 800px;
+
+  .meetings-card {
+    padding: 1.5rem;
+    max-height: 80vh;
   }
-  
-  .meetings-list h2 {
-    margin-bottom: 2rem;
+
+  .meetings-card h2 {
     font-size: 2.5rem;
-    color: var(--accent-color);
-  }
-  
-  .meeting-item {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 1rem;
     margin-bottom: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
   }
-  
-  .meeting-item p {
-    margin-right: 1rem;
+
+  .appointments-list {
+    max-height: calc(80vh - 180px);
   }
-  
-  .meeting-item button {
-    flex-shrink: 0;
+}
+
+/* Further adjustments for smaller screens */
+@media screen and (max-width: 768px) {
+  .meetings-container {
+    padding: 1rem;
+    margin: 1rem;
   }
-  
-  @media (max-width: 768px) {
-    .meetings-list {
-      width: 90%;
-      padding: 2rem 3rem;
-    }
-  
-    .meetings-list h2 {
-      font-size: 2rem;
-    }
-  
-    .meeting-item {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-  
-    .meeting-item p {
-      margin-bottom: 0.5rem;
-    }
+
+  .button-container {
+    flex-direction: column;
   }
+}

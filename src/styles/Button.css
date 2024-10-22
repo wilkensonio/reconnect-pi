@@ -1,24 +1,94 @@
 .button {
-    padding: 1rem 2.5rem;
+  font-size: 1.3rem;
+  padding: 1rem 2rem;
+  color: #ffffff;
+  background-color: rgba(59, 131, 246, 0.959);
+  border: 1px solid navy;
+  border-radius: 8px;
+  cursor: pointer;
+  text-shadow:
+    -1px -1px 0 navy,
+    1px -1px 0 navy,
+    -1px 1px 0 navy,
+    1px 1px 0 navy;
+  transition: all 0.2s ease;
+}
+
+.button:hover {
+  background-color: rgba(59, 130, 246, 1);
+  transform: translateY(-2px);
+}
+
+/* Faculty change styling */
+.button--faculty-change,
+.change-faculty-button,
+.back-button {
+  background-color: rgba(100, 116, 139, 0.8) !important;
+}
+
+.button--faculty-change:hover,
+.change-faculty-button:hover,
+.back-button:hover {
+  background-color: rgba(100, 116, 139, 0.9) !important;
+}
+
+/* Danger/Cancel button styling */
+.button--danger,
+.cancel-button {
+  background-color: rgba(239, 68, 68, 0.8) !important;
+}
+
+.button--danger:hover,
+.cancel-button:hover {
+  background-color: rgba(239, 68, 68, 0.9) !important;
+}
+
+/* Size modifiers */
+.button--large,
+.large-button {
+  font-size: 1.5rem;
+  padding: 1.2rem 2rem;
+}
+
+/* Width modifiers */
+.button--full-width,
+.full-width-button {
+  width: 100%;
+  display: block;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .button {
     font-size: 1.2rem;
-    color: var(--text-color);
-    background-color: var(--button-background);
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    width: 100%;
+    padding: 0.8rem 1.5rem;
   }
-  
-  .button:hover {
-    background-color: var(--button-hover);
-    transform: translateY(-3px);
+
+  .button--large,
+  .large-button {
+    font-size: 1.3rem;
+    padding: 1rem 1.8rem;
   }
-  
-  .button:active {
-    transform: translateY(0);
-  }
-  
-  .back-button {
-    margin-top: 1rem;
-  }
+}
+
+/* Maintain existing button styles for backward compatibility */
+.back-button,
+.change-faculty-button,
+.full-width-button,
+.large-button {
+  color: #ffffff;
+  text-shadow:
+    -1px -1px 0 navy,
+    1px -1px 0 navy,
+    -1px 1px 0 navy,
+    1px 1px 0 navy !important;
+  border: 1px solid navy !important;
+  transition: all 0.2s ease;
+}
+
+/* Handle combined classes */
+.full-width-button.large-button {
+  width: 100%;
+  font-size: 1.5rem;
+  padding: 1.2rem 2rem;
+}

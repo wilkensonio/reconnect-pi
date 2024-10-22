@@ -1,0 +1,56 @@
+.error-boundary {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 1rem;
+    background-color: rgba(8, 35, 153, 0.1);
+  }
+  
+  .error-card {
+    background-color: rgba(8, 35, 153, 0.849);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    border: 3px solid var(--accent-color);
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+  }
+  
+  .error-card h2 {
+    color: white;
+    font-size: 2rem;
+    margin: 0 0 1rem 0;
+    text-shadow:
+      -1px -1px 0 navy,
+      1px -1px 0 navy,
+      -1px 1px 0 navy,
+      1px 1px 0 navy;
+  }
+  
+  .error-card p {
+    color: white;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+  }
+  
+  .error-card button {
+    background-color: rgba(59, 131, 246, 0.959);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    border: 1px solid navy;
+    text-shadow:
+      -1px -1px 0 navy,
+      1px -1px 0 navy,
+      -1px 1px 0 navy,
+      1px 1px 0 navy;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+  }
+  
+  .error-card button:hover {
+    background-color: rgba(59, 130, 246, 1);
+    transform: translateY(-2px);
+  }

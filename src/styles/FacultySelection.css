@@ -1,0 +1,179 @@
+.faculty-selection {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100vw;
+    position: relative;
+  }
+  
+  .faculty-selection-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 1400px;
+    padding: 2rem;
+    margin: 2rem;
+  }
+  
+  .faculty-card {
+    background-color: rgba(8, 35, 153, 0.849);
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    border: 3px solid var(--accent-color);
+    width: 100%;
+    max-width: 1000px;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+  }
+  
+  .faculty-card h2 {
+    color: white;
+    text-align: center;
+    font-size: 3.5rem;
+    margin: 0 0 2rem 0;
+    text-shadow:
+      -1px -1px 0 navy,
+      1px -1px 0 navy,
+      -1px 1px 0 navy,
+      1px 1px 0 navy;
+  }
+  
+  .faculty-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .faculty-item {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .faculty-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .faculty-button {
+    width: 100%;
+    height: 100%;
+    padding: 1.5rem;
+    background-color: rgba(59, 131, 246, 0.959);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: left;
+    transition: background-color 0.2s ease;
+  }
+  
+  .faculty-button:hover {
+    background-color: rgba(59, 130, 246, 1);
+  }
+  
+  .faculty-name {
+    font-size: 1.4rem;
+    font-weight: bold;
+    text-shadow:
+      -1px -1px 0 navy,
+      1px -1px 0 navy,
+      -1px 1px 0 navy,
+      1px 1px 0 navy;
+  }
+  
+  .faculty-details {
+    font-size: 1rem;
+    opacity: 0.9;
+  }
+  
+  .faculty-department {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-top: 0.5rem;
+  }
+  
+  /* Scrollbar styling */
+  .faculty-card {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  }
+  
+  .faculty-card::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .faculty-card::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+  }
+  
+  .faculty-card::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+  }
+  
+  .loading-container,
+  .error-container {
+    text-align: center;
+    padding: 2rem;
+    color: white;
+  }
+  
+  .loading-spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top: 4px solid white;
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 1rem;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* Specific adjustments for 10.1-inch screen */
+  @media screen and (max-width: 1024px) {
+    .faculty-selection-container {
+      padding: 1.5rem;
+      margin: 1.5rem;
+    }
+  
+    .faculty-card {
+      padding: 1.5rem;
+    }
+  
+    .faculty-card h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+    }
+  
+    .faculty-grid {
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+  }
+  
+  /* Further adjustments for smaller screens */
+  @media screen and (max-width: 768px) {
+    .faculty-selection-container {
+      padding: 1rem;
+      margin: 1rem;
+    }
+  
+    .faculty-grid {
+      grid-template-columns: 1fr;
+    }
+  }

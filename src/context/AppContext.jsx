@@ -3,37 +3,46 @@ import { apiService } from '../services/api';
 
 const AppContext = createContext();
 
-/**
- * Custom hook to use the AppContext
- * @returns {Object} The context value
- */
-export const useAppContext = () => useContext(AppContext);
+export const useAppContext = () => {
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error('useAppContext must be used within an AppProvider');
+  }
+  return context;
+};
 
-/**
- * AppProvider component for global state management
- * @param {Object} props - The component props
- * @param {React.ReactNode} props.children - The child components
- */
 export const AppProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [selectedFaculty, setSelectedFaculty] = useState(() => {
+    // Initialize from sessionStorage if available
+    const storedFacultyId = sessionStorage.getItem('selected_faculty_id');
+    return storedFacultyId ? { id: storedFacultyId } : null;
+  });
 
-  /**
-   * Logout function to clear user data and token
-   */
   const logout = async () => {
     try {
       await apiService.logout();
       setUser(null);
-      window.location.href = '/login';
+      // Clear faculty selection on logout
+      sessionStorage.removeItem('selected_faculty_id');
+      setSelectedFaculty(null);
+      window.location.href = '/';
     } catch (error) {
       console.error('Error during logout:', error);
     }
+  };
+
+  const selectFaculty = (facultyId) => {
+    sessionStorage.setItem('selected_faculty_id', facultyId);
+    setSelectedFaculty({ id: facultyId });
   };
 
   const value = {
     user,
     setUser,
     logout,
+    selectedFaculty,
+    selectFaculty
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

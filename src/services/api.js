@@ -26,6 +26,7 @@ api.interceptors.response.use(
   error => {
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('reconnect_access_token');
+      sessionStorage.removeItem('selected_faculty_id');
       window.location.href = '/login';
     }
     return Promise.reject(error);
@@ -45,6 +46,35 @@ export const apiService = {
     }
   },
 
+  async getAllFaculty() {
+    try {
+      // For development, return sample data
+      return [{
+        id: "70578617",
+        first_name: "J",
+        last_name: "Escobar",
+        title: "Professor",
+        department: "Computer Science"
+      }];
+      // Uncomment when API endpoint is ready:
+      // const response = await api.get('/users/faculty/');
+      // return response.data;
+    } catch (error) {
+      console.error('Error fetching faculty members:', error);
+      throw error;
+    }
+  },
+
+  async getAvailabilitiesByUser(facultyId) {
+    try {
+      const response = await api.get(`/availability/get-by-user/${facultyId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching faculty availabilities:', error);
+      throw error;
+    }
+  },
+
   async getStudentAppointments(studentId) {
     try {
       const response = await api.get(`/appointments/?student_id=${studentId}`);
@@ -54,6 +84,8 @@ export const apiService = {
       throw error;
     }
   },
+
+  // ... rest of your existing methods ...
 
   async createAppointment(appointmentData) {
     try {
@@ -78,63 +110,10 @@ export const apiService = {
     }
   },
 
-  async getAppointmentById(appointmentId) {
-    try {
-      const response = await api.get(`/appointment/get-by-id/${appointmentId}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching appointment:', error);
-      throw error;
-    }
-  },
-
-  async updateAppointment(appointmentId, appointmentData) {
-    try {
-      const response = await api.put(`/appointment/update/${appointmentId}`, appointmentData);
-      return response.data;
-    } catch (error) {
-      console.error('Error updating appointment:', error);
-      throw error;
-    }
-  },
-
-  async deleteAppointment(appointmentId) {
-    try {
-      const response = await api.delete(`/appointment/delete/${appointmentId}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error deleting appointment:', error);
-      throw error;
-    }
-  },
-
-  async getAvailabilities() {
-    try {
-      const response = await api.get('/availabilities/');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching availabilities:', error);
-      throw error;
-    }
-  },
-
-  // New method for faculty-specific availabilities
-  async getAvailabilitiesByUser(facultyId) {
-    try {
-      const response = await api.get(`/availability/get-by-user/${facultyId}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching faculty availabilities:', error);
-      if (error.response && error.response.data) {
-        throw new Error(error.response.data.detail || 'Failed to fetch faculty availabilities');
-      }
-      throw error;
-    }
-  },
-
   async logout() {
     try {
       localStorage.removeItem('reconnect_access_token');
+      sessionStorage.removeItem('selected_faculty_id');
     } catch (error) {
       console.error('Logout error:', error);
     }

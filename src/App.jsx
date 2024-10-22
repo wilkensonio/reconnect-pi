@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { AppProvider, useAppContext } from './context/AppContext';
+import ErrorBoundary from './components/ErrorBoundary';
+import FacultySelection from './components/FacultySelection';
 import Home from './components/Home';
 import Login from './components/Login';
 import Schedule from './components/Schedule';
@@ -9,20 +11,53 @@ import './styles/App.css';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAppContext();
+  
   if (!user) {
-    return <Navigate to="/login" replace />;
+    const currentPath = window.location.pathname;
+    return <Navigate to="/login" replace state={{ from: currentPath }} />;
   }
+
+  // Check if faculty is selected for relevant routes
+  if (['/schedule', '/home'].includes(window.location.pathname)) {
+    const selectedFacultyId = sessionStorage.getItem('selected_faculty_id');
+    if (!selectedFacultyId) {
+      return <Navigate to="/" replace />;
+    }
+  }
+
   return children;
 };
 
 function AppRoutes() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/schedule" element={<ProtectedRoute><Schedule /></ProtectedRoute>} />
-      <Route path="/view" element={<ProtectedRoute><ViewAppointments /></ProtectedRoute>} />
-    </Routes>
+    <ErrorBoundary>
+      <Routes>
+        <Route path="/" element={<FacultySelection />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/home" element={
+          <ProtectedRoute>
+            <ErrorBoundary>
+              <Home />
+            </ErrorBoundary>
+          </ProtectedRoute>
+        } />
+        <Route path="/schedule" element={
+          <ProtectedRoute>
+            <ErrorBoundary>
+              <Schedule />
+            </ErrorBoundary>
+          </ProtectedRoute>
+        } />
+        <Route path="/view" element={
+          <ProtectedRoute>
+            <ErrorBoundary>
+              <ViewAppointments />
+            </ErrorBoundary>
+          </ProtectedRoute>
+        } />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </ErrorBoundary>
   );
 }
 

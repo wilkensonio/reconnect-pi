@@ -25,10 +25,30 @@ const Schedule = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [reason, setReason] = useState('');
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const [facultyInfo, setFacultyInfo] = useState(null);
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
   const inputRef = useRef(null);
   const { user } = useAppContext();
+  const facultyId = sessionStorage.getItem('selected_faculty_id');
+
+  useEffect(() => {
+    if (!facultyId) {
+      navigate('/', { replace: true });
+      return;
+    }
+
+    const fetchFacultyInfo = async () => {
+      try {
+        const info = await apiService.getFacultyInfo(facultyId);
+        setFacultyInfo(info);
+      } catch (error) {
+        console.error('Error fetching faculty info:', error);
+      }
+    };
+
+    fetchFacultyInfo();
+  }, [facultyId, navigate]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -53,14 +73,15 @@ const Schedule = () => {
         end_time: new Date(selectedDate.getTime() + 45 * 60000).toTimeString().slice(0, 5),
         reason,
         student_id: user?.student_id,
-        faculty_id: "70578617" // This should be dynamically set based on faculty member
+        faculty_id: facultyId
       };
+      
       await apiService.createAppointment(appointmentData);
       alert('Meeting scheduled successfully');
       navigate('/view');
     } catch (error) {
       console.error('Error scheduling meeting:', error);
-      alert('Failed to schedule meeting. Please try again.');
+      alert(error.message || 'Failed to schedule meeting. Please try again.');
     }
   };
 
@@ -78,7 +99,14 @@ const Schedule = () => {
       <BackgroundLogos logoSrc={logoSrc} />
       <div className="schedule-container">
         <div className="schedule-card title-card">
-          <h2 className="schedule-title">Schedule Meeting</h2>
+          <h2 className="schedule-title">
+            Schedule Meeting
+            {facultyInfo && (
+              <div className="faculty-info">
+                with Prof. {facultyInfo.last_name}
+              </div>
+            )}
+          </h2>
         </div>
         <form onSubmit={handleSubmit} className="schedule-form">
           <div className="schedule-card date-picker-card">
@@ -86,8 +114,8 @@ const Schedule = () => {
               <label htmlFor="date-picker">Select Date and Time:</label>
               <Calendar
                 selectedDate={selectedDate}
-                onSelectDate={(date) => setSelectedDate(date)}
-                facultyId="70578617" // Replace with actual faculty ID or pass it through props
+                onSelectDate={setSelectedDate}
+                facultyId={facultyId}
               />
             </div>
           </div>
@@ -126,8 +154,8 @@ const Schedule = () => {
               <Button type="submit" className="full-width-button large-button">
                 Schedule Meeting
               </Button>
-              <Button
-                onClick={() => navigate('/')}
+              <Button 
+                onClick={() => navigate('/home')} 
                 className="full-width-button large-button back-button"
               >
                 Back to Home
