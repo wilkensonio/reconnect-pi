@@ -118,10 +118,22 @@ export const apiService = {
     }
   },
 
+  // New method for faculty-specific availabilities
+  async getAvailabilitiesByUser(facultyId) {
+    try {
+      const response = await api.get(`/availability/get-by-user/${facultyId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching faculty availabilities:', error);
+      if (error.response && error.response.data) {
+        throw new Error(error.response.data.detail || 'Failed to fetch faculty availabilities');
+      }
+      throw error;
+    }
+  },
+
   async logout() {
     try {
-      // If you have a backend logout endpoint, you can call it here
-      // await api.post('/logout');
       localStorage.removeItem('reconnect_access_token');
     } catch (error) {
       console.error('Logout error:', error);

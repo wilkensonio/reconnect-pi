@@ -47,7 +47,6 @@ const Schedule = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log('Scheduling meeting:', { date: selectedDate, reason });
       const appointmentData = {
         date: selectedDate.toISOString().split('T')[0],
         start_time: selectedDate.toTimeString().slice(0, 5),
@@ -57,7 +56,6 @@ const Schedule = () => {
         faculty_id: "70578617" // This should be dynamically set based on faculty member
       };
       await apiService.createAppointment(appointmentData);
-      console.log('Meeting scheduled successfully');
       alert('Meeting scheduled successfully');
       navigate('/view');
     } catch (error) {
@@ -67,7 +65,6 @@ const Schedule = () => {
   };
 
   const handlePredefinedMessageClick = (message) => {
-    console.log('Selected predefined message:', message);
     setReason(message);
     setIsDropdownVisible(false);
   };
@@ -89,10 +86,8 @@ const Schedule = () => {
               <label htmlFor="date-picker">Select Date and Time:</label>
               <Calendar
                 selectedDate={selectedDate}
-                onSelectDate={(date) => {
-                  console.log('Selected date:', date);
-                  setSelectedDate(date);
-                }}
+                onSelectDate={(date) => setSelectedDate(date)}
+                facultyId="70578617" // Replace with actual faculty ID or pass it through props
               />
             </div>
           </div>
@@ -128,8 +123,15 @@ const Schedule = () => {
               </div>
             </div>
             <div className="button-container">
-              <Button type="submit" className="full-width-button large-button">Schedule Meeting</Button>
-              <Button onClick={() => navigate('/')} className="full-width-button large-button back-button">Back to Home</Button>
+              <Button type="submit" className="full-width-button large-button">
+                Schedule Meeting
+              </Button>
+              <Button
+                onClick={() => navigate('/')}
+                className="full-width-button large-button back-button"
+              >
+                Back to Home
+              </Button>
             </div>
           </div>
         </form>

@@ -4,7 +4,7 @@
   align-items: center;
   min-height: 50vh;
   max-height: 100vh;
-  padding: 1rem; /* Add padding for smaller screens */
+  padding: 1rem;
 }
 
 .schedule-container {
@@ -23,22 +23,9 @@
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
   margin-bottom: 0.5rem;
   border: 3px solid var(--accent-color);
-  position: relative; /* Add this to position the opaque background */
+  position: relative;
 }
 
-/* New class for the opaque background */
-.opaque-background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(8, 35, 153, 0.95); /* Adjust opacity as needed */
-  border-radius: 13px; /* Slightly smaller than the parent to avoid covering the border */
-  z-index: 1; /* Place it above the background but below the content */
-}
-
-/* Adjust all content to be above the opaque background */
 .title-card, .schedule-form, .date-picker-card, .reason-card, .button-container {
   position: relative;
   z-index: 2;
@@ -69,39 +56,44 @@
 }
 
 .date-picker-card {
-  width: 80%; /* Make the date-picker-card larger */
+  width: 80%;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
 .reason-card {
-  width: 40%; /* Adjust the reason-card width accordingly */
+  width: 40%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  padding-top: 1.2rem;
 }
 
 .date-picker-container {
   width: 100%;
 }
 
-.reason-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
 .date-picker-container,
 .reason-container {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.2rem;
+}
+
+.reason-container label {
+  padding-bottom: 0.2rem;
+  font-weight: bold;
+  padding-top: 0.5rem;
+}
+
+.date-picker-container label {
+  flex-direction: column;
 }
 
 .date-picker-container label,
 .reason-container label {
   display: block;
   margin-bottom: 0.5rem;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   color: #ffffff;
   text-shadow:
     -1px -1px 0 navy,
@@ -111,7 +103,10 @@
 }
 
 .input-dropdown-container {
-  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .reason-input {
@@ -132,20 +127,20 @@
 }
 
 .predefined-messages {
-  display: block; /* Enable the pop-out */
-  max-height: 130px; /* Set a maximum height */
-  overflow-y: auto; /* Enable vertical scrolling */
-  padding: 0.5rem; /* Add some padding */
-  background-color: rgba(8, 35, 153, 0.85); /* Match the background color */
-  border: 1px solid var(--accent-color); /* Add a border */
-  border-radius: 8px; /* Add border radius */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add some shadow for depth */
+  display: block;
+  max-height: 130px;
+  overflow-y: auto;
+  padding: 0.5rem;
+  background-color: rgba(8, 35, 153, 0.85);
+  border: 1px solid var(--accent-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .predefined-message {
   padding: 0.8rem 1rem;
   cursor: pointer;
-  font-size: 1rem; /* Make the text smaller */
+  font-size: 1rem;
   color: #ffffff;
 }
 
@@ -157,7 +152,7 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding-bottom: 1.3rem;
+  padding-bottom: 0.1rem;
 }
 
 .full-width-button {
@@ -185,136 +180,18 @@
 
 @media (max-width: 1024px) {
   .schedule-container {
-    transform: scale(0.8); /* Scale down to 80% */
+    transform: scale(0.8);
   }
 }
 
 @media (max-width: 768px) {
   .schedule-container {
-    transform: scale(0.7); /* Scale down to 70% */
+    transform: scale(0.7);
   }
 }
 
 @media (max-width: 480px) {
   .schedule-container {
-    transform: scale(0.6); /* Scale down to 60% */
+    transform: scale(0.6);
   }
 }
-
-/* Calendar specific styles to ensure visibility */
-.custom-calendar .react-datepicker__current-month,
-.custom-calendar .react-datepicker-time__header,
-.custom-calendar .react-datepicker__day-name,
-.custom-calendar .react-datepicker__day,
-.custom-calendar .react-datepicker__time-name {
-  color: #e6e6e6;
-  text-shadow: none;
-}
-
-.custom-calendar .react-datepicker__day--selected {
-  color: #ffffff;
-  background-color: #1f6feb;
-}
-
-/* Match the header height for the time picker and calendar */
-.custom-calendar .react-datepicker__header,
-.custom-calendar .react-datepicker-time__header {
-  height: 95px; /* Adjust this value to match the desired height */
-}
-
-.custom-calendar .react-datepicker-time__header::before {
-  content: "\f017"; /* Font Awesome code for a clock */
-  font-family: "Font Awesome 5 Free"; /* Ensure the correct font family is used */
-  font-weight: 900; /* Ensure the correct font weight is used */
-  position: absolute;
-  left: 50%; /* Center horizontally */
-  top: 50%; /* Center vertically */
-  transform: translate(-50%, -50%); /* Adjust to center precisely */
-  font-size: 3.5rem; /* Increase the size */
-  color: #1234a5;
-}
-
-/* Style for the previous and next navigation buttons */
-.custom-calendar .react-datepicker__navigation--previous,
-.custom-calendar .react-datepicker__navigation--next {
-  border: none;
-  background: linear-gradient(135deg, #0f37bb, #1f6feb); /* Gradient background */
-  color: #ffffff;
-  padding: 0.5rem;
-  border-radius: 50%;
-  width: 2.5rem; /* Slightly larger */
-  height: 2.5rem; /* Slightly larger */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border: 2px solid #ffffff; /* Add a white border */
-  transition: transform 0.2s ease, background-color 0.2s ease; /* Add transition for hover effect */
-}
-
-.custom-calendar .react-datepicker__navigation--previous:hover,
-.custom-calendar .react-datepicker__navigation--next:hover {
-  background: linear-gradient(135deg, #0d2f9b, #1a5edb); /* Slightly darker gradient for hover effect */
-  transform: scale(1.1); /* Slightly enlarge on hover */
-}
-
-/* Make the dates navy */
-.custom-calendar .react-datepicker__day {
-  color: navy; /* Navy color for dates */
-  font-weight: bold; /* Make the text bold */
-}
-
-/* Make the weekdays a different accent blue */
-.custom-calendar .react-datepicker__day-name {
-  color: #1d3585; /* Different color for weekdays */
-  font-weight: bold; /* Make the text bold */
-}
-
-.custom-calendar .react-datepicker__time-name {
-  color: #11176d; /* Darker color for time names */
-  font-weight: bold; /* Make the text bold */
-}
-
-.custom-calendar .react-datepicker__day--selected {
-  color: #ffffff;
-  background-color: #1f6feb;
-}
-
-/* Fancy styles for the calendar and time picker separator */
-.custom-calendar .react-datepicker__divider {
-  height: 30px; /* Shorter height */
-  width: 2px;
-  background-color: #0f37bb;
-  margin: 0 auto;
-  border-radius: 1px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Add some fancy styles to the calendar */
-.custom-calendar .react-datepicker {
-  border: 2px solid #0f37bb;
-  border-radius: 16px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-
-.custom-calendar .react-datepicker__header {
-  background: linear-gradient(135deg, #0f37bb, #1f6feb);
-  color: #ffffff;
-  border-bottom: 1px solid #0f37bb;
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
-}
-
-.custom-calendar .react-datepicker__day:hover {
-  background-color: #3e3cdb;
-  color: rgb(243, 243, 248);
-  border-radius: 50%;
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.custom-calendar .react-datepicker__day--keyboard-selected {
-  background-color: #1f6feb;
-  color: #ffffff;
-  border-radius: 50%;
-}
-
