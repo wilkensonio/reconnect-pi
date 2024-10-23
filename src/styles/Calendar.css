@@ -55,7 +55,7 @@
 }
 
 .custom-calendar .react-datepicker__navigation--next {
-  right: 225px;
+  right: 260px;
 }
 
 .custom-calendar .react-datepicker__navigation-icon::before {
@@ -171,6 +171,7 @@
   border: 2px solid #ffffff;
   transition: transform 0.2s ease, background-color 0.2s ease;
 }
+
 
 .custom-calendar .react-datepicker__navigation--previous:hover,
 .custom-calendar .react-datepicker__navigation--next:hover {

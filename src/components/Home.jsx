@@ -47,7 +47,7 @@ const Home = () => {
         <div className="card home-card">
           <div className="faculty-header">
             {facultyInfo && (
-              <h2>Prof. {facultyInfo.last_name}'s Office Hours</h2>
+              <h2>Prof. {facultyInfo.last_name}'s Office</h2>
             )}
           </div>
           <div className="button-container">

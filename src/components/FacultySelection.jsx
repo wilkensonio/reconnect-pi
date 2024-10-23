@@ -7,7 +7,7 @@ import Button from './Button';
 import '../styles/FacultySelection.css';
 import logoSrc from '/rcnnct.png';
 
-// Sample faculty data while API endpoint is being developed
+// Sample faculty data while figuring out the API
 const SAMPLE_FACULTY = [
   {
     id: "70578617",
