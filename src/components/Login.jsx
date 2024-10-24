@@ -1,22 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiService } from '../services/api';
 import { useAppContext } from '../context/AppContext';
 import BackgroundLogos from './BackgroundLogos';
 import Button from './Button';
 import '../styles/Login.css';
-import logoSrc from '/rcnnct.png'; // Adjust the path as per your setup
-import cscLogo from '/CSC logo.png'; // Adjust the path as per your setup
 
 const Login = () => {
   const [userId, setUserId] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showKeypad, setShowKeypad] = useState(false); // State to toggle keypad
+  const [showKeypad, setShowKeypad] = useState(false);
+  const keypadRef = useRef(null);
   const navigate = useNavigate();
   const { setUser, user } = useAppContext();
 
-  // If user is already logged in, redirect to faculty selection
   useEffect(() => {
     if (user) {
       navigate('/select-faculty');
@@ -30,8 +28,6 @@ const Login = () => {
 
     try {
       const response = await apiService.kioskLogin(userId);
-
-      // Set user in context
       setUser({
         id: response.id,
         student_id: response.student_id,
@@ -39,91 +35,178 @@ const Login = () => {
         last_name: response.last_name,
         email: response.email,
       });
-
-      // Navigate to faculty selection
       navigate('/select-faculty', { replace: true });
     } catch (error) {
       console.error('Login error:', error);
       let errorMessage = 'An unexpected error occurred. Please try again.';
-
       if (error.message.includes('Network Error')) {
         errorMessage = 'Network error. Please check your connection and try again.';
       } else if (error.response) {
         errorMessage = error.response.data?.detail || 'Login failed. Please try again.';
       }
-
       setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  // Keypad input handler
+  const createRippleEffect = (event, number) => {
+    const button = event.currentTarget;
+    const grid = keypadRef.current;
+    if (!grid) return;
+
+    const buttons = Array.from(grid.querySelectorAll('.keypad-button'));
+    const buttonRect = button.getBoundingClientRect();
+    const sourceX = buttonRect.left + buttonRect.width / 2;
+    const sourceY = buttonRect.top + buttonRect.height / 2;
+
+    const color = number === '←' ? '#e74c3c' : 
+                 number === '↵' ? '#3b83f6' : 
+                 '#3498db';
+
+    buttons.forEach(btn => {
+      const targetRect = btn.getBoundingClientRect();
+      const targetX = targetRect.left + targetRect.width / 2;
+      const targetY = targetRect.top + targetRect.height / 2;
+
+      const distance = Math.sqrt(
+        Math.pow(targetX - sourceX, 2) + 
+        Math.pow(targetY - sourceY, 2)
+      );
+
+      const delay = (distance / 500) * 0.3;
+
+      const ripple = document.createElement('div');
+      ripple.classList.add('key-ripple');
+      ripple.style.setProperty('--ripple-color', color);
+      ripple.style.animationDelay = `${delay}s`;
+      
+      btn.appendChild(ripple);
+
+      ripple.addEventListener('animationend', () => {
+        ripple.remove();
+      });
+    });
+  };
+
   const handleKeypadClick = (number) => {
     setUserId(prev => prev + number);
   };
 
-  // Input focus handler to open keypad
   const handleInputFocus = () => {
-    setShowKeypad(true); // Open keypad on input focus
+    setShowKeypad(true);
+  };
+
+  const handleKeypadSubmit = () => {
+    setShowKeypad(false);
+    if (userId) {
+      handleSubmit({ preventDefault: () => {} });
+    }
+  };
+
+  const handleBackspace = () => {
+    setUserId(prev => prev.slice(0, -1));
   };
 
   return (
     <div className="login">
-      <BackgroundLogos logoSrc={logoSrc} />
+      <BackgroundLogos logoSrc="/rcnnct.png" />
       <div className="login-container">
-        <div className="logo-card">
-          <img src={cscLogo} alt="CSC Logo" className="logo-image" />
+        <div className="unified-card">
+          <div className="card-content">
+            <div className="logo-section">
+              <img src="/CSC logo.png" alt="CSC Logo" className="logo-image" />
+            </div>
+
+            <div className="login-section">
+              <h2>Student Login</h2>
+              <form onSubmit={handleSubmit}>
+                <div className="input-group">
+                  <input
+                    type="text"
+                    value={userId}
+                    onChange={(e) => setUserId(e.target.value)}
+                    placeholder="Enter your Student ID or scan barcode"
+                    required
+                    className="login-input"
+                    disabled={loading}
+                    onFocus={handleInputFocus}
+                  />
+                </div>
+                <div className="button-group">
+                  <Button 
+                    type="submit" 
+                    className="login-button"
+                    disabled={loading}
+                  >
+                    {loading ? 'Logging in...' : 'Login'}
+                  </Button>
+                </div>
+                {error && <p className="error-message">{error}</p>}
+              </form>
+            </div>
+          </div>
         </div>
 
-        <div className="right-card">
-          <h2>Student Login</h2>
-          <form onSubmit={handleSubmit}>
-            <div className="input-group">
-              <input
-                type="text"
-                value={userId}
-                onChange={(e) => setUserId(e.target.value)}
-                placeholder="Enter your Student ID or scan barcode"
-                required
-                className="login-input"
-                disabled={loading}
-                onFocus={handleInputFocus} // Open keypad when the input is focused
-              />
-            </div>
-            <div className="button-group">
-              <Button 
-                type="submit" 
-                className="login-button"
-                disabled={loading}
-              >
-                {loading ? 'Logging in...' : 'Login'}
-              </Button>
-            </div>
-            {error && <p className="error-message">{error}</p>}
-          </form>
-        </div>
-
-        {/* Keypad Pop-up */}
         {showKeypad && (
           <div className="keypad-overlay">
-            <div className="keypad fancy-keypad">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((num) => (
-                <button
-                  key={num}
-                  className="keypad-button"
-                  onClick={() => handleKeypadClick(num)}
+            <div className="keypad">
+              <div className="keypad-display">
+                <span 
+                  className="display-value"
+                  ref={el => {
+                    if (el) {
+                      const containerWidth = el.parentElement.offsetWidth - 32; // Account for padding
+                      const contentWidth = el.scrollWidth;
+                      const scale = Math.min(1, containerWidth / contentWidth);
+                      el.style.setProperty('--scale', scale);
+                    }
+                  }}
                 >
-                  {num}
+                  {userId}
+                </span>
+              </div>
+              <div className="keypad-grid" ref={keypadRef}>
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+                  <button
+                    key={num}
+                    className="keypad-button"
+                    onClick={(e) => {
+                      handleKeypadClick(num);
+                      createRippleEffect(e, num);
+                    }}
+                  >
+                    {num}
+                  </button>
+                ))}
+                <button
+                  className="keypad-button"
+                  onClick={(e) => {
+                    handleKeypadClick(0);
+                    createRippleEffect(e, 0);
+                  }}
+                >
+                  0
                 </button>
-              ))}
-              <Button
-                type="button"
-                className="login-button"
-                onClick={() => setShowKeypad(false)} // Close keypad
-              >
-                Close Keypad
-              </Button>
+                <button
+                  className="keypad-button function-button"
+                  onClick={(e) => {
+                    handleBackspace();
+                    createRippleEffect(e, '←');
+                  }}
+                >
+                  ←
+                </button>
+                <button
+                  className="keypad-button enter-button"
+                  onClick={(e) => {
+                    handleKeypadSubmit();
+                    createRippleEffect(e, '↵');
+                  }}
+                >
+                  ↵
+                </button>
+              </div>
             </div>
           </div>
         )}
