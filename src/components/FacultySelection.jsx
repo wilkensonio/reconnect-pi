@@ -17,45 +17,65 @@ const FacultySelection = () => {
 
   useEffect(() => {
     const fetchFaculty = async () => {
-      const token = localStorage.getItem('reconnect_access_token');
-      if (!token) {
-        navigate('/login', { state: { from: location.pathname } });
-        return;
-      }
-
       try {
         setLoading(true);
         setError(null);
-        const response = await apiService.getAllFaculty();
-        console.log('Faculty response:', response); // Debug log
-        setFaculty(response);
+
+        // Check if we have a token
+        const token = localStorage.getItem('reconnect_access_token');
+        
+        if (!token) {
+          // If coming from login page, show error
+          if (location.state?.from === '/login') {
+            setError('Authentication required to view faculty members.');
+          } else {
+            // First time visitors or expired token - use sample data temporarily
+            setFaculty([{
+              id: "70578617",
+              user_id: "70578617",
+              first_name: "J",
+              last_name: "Escobar",
+              title: "Professor",
+              department: "Computer Science"
+            }]);
+          }
+        } else {
+          // We have a token, try to fetch faculty
+          const facultyMembers = await apiService.getAllFaculty();
+          setFaculty(facultyMembers);
+        }
       } catch (error) {
         console.error('Error fetching faculty:', error);
-        setError('Failed to load faculty members. Please try again.');
-        // Don't redirect on error, just show error message
+        // If unauthorized, use sample data
+        if (error.response?.status === 401) {
+          setFaculty([{
+            id: "70578617",
+            user_id: "70578617",
+            first_name: "J",
+            last_name: "Escobar",
+            title: "Professor",
+            department: "Computer Science"
+          }]);
+        } else {
+          setError('Failed to load faculty members. Please try again later.');
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchFaculty();
-  }, [navigate, location.pathname]);
+  }, [location.state]);
 
   const handleFacultySelect = (facultyId) => {
     sessionStorage.setItem('selected_faculty_id', facultyId);
-    const token = localStorage.getItem('reconnect_access_token');
     
-    if (!token || !user) {
-      navigate('/login', { state: { from: '/home' } });
+    // If no token or user, go to login
+    if (!localStorage.getItem('reconnect_access_token') || !user) {
+      navigate('/login');
     } else {
       navigate('/home');
     }
-  };
-
-  const handleRetry = () => {
-    setLoading(true);
-    setError(null);
-    window.location.reload();
   };
 
   if (loading) {
@@ -80,28 +100,32 @@ const FacultySelection = () => {
       <div className="faculty-selection-container">
         <div className="faculty-card">
           <h2>Select a Faculty Member</h2>
-          {error ? (
+          <div className="faculty-grid">
+            {faculty.map((member) => (
+              <div key={member.user_id} className="faculty-item">
+                <button
+                  onClick={() => handleFacultySelect(member.user_id)}
+                  className="faculty-button"
+                >
+                  <div className="faculty-name">
+                    {member.last_name}, {member.first_name}
+                  </div>
+                  <div className="faculty-details">
+                    {member.title || 'Faculty Member'}
+                  </div>
+                  {member.department && (
+                    <div className="faculty-department">
+                      {member.department}
+                    </div>
+                  )}
+                </button>
+              </div>
+            ))}
+          </div>
+          {error && (
             <div className="error-container">
-              <p>{error}</p>
-              <Button onClick={handleRetry}>Try Again</Button>
-            </div>
-          ) : (
-            <div className="faculty-grid">
-              {faculty.map((member) => (
-                <div key={member.user_id || member.id} className="faculty-item">
-                  <button
-                    onClick={() => handleFacultySelect(member.user_id)}
-                    className="faculty-button"
-                  >
-                    <div className="faculty-name">
-                      {member.last_name}, {member.first_name}
-                    </div>
-                    <div className="faculty-details">
-                      Faculty Member
-                    </div>
-                  </button>
-                </div>
-              ))}
+              <p className="error-message">{error}</p>
+              <Button onClick={() => window.location.reload()}>Try Again</Button>
             </div>
           )}
         </div>

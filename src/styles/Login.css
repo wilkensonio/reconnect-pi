@@ -1,3 +1,4 @@
+/* General container styling */
 .login-container {
   display: flex;
   justify-content: center;
@@ -9,36 +10,50 @@
 
 .login-container-inner {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: space-between; /* Side-by-side layout */
+  align-items: stretch; /* Ensure both cards stretch proportionally */
   width: 100%;
   max-width: 1400px;
-  padding: 1rem;
+  padding: rem;
+  box-sizing: border-box;
 }
 
+/* Stylized login card */
 .login-card {
-  background-color: rgba(8, 35, 153, 0.849);
+  background-color: rgba(8, 35, 153, 0.95); /* More opaque */
   border-radius: 16px;
   padding: 2.5rem 3rem;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
   border: 3px solid var(--accent-color);
-  width: 100%;
-  max-width: 600px;
-  position: relative;
+  flex-grow: 2; /* Keep the width ratio */
+  width: 60%;  /* Set width to 60% of the container */
+  max-width: 600px;  /* Add max-width for larger screens */
+  height: 100%;  /* Ensure the card stretches fully */
 }
 
-.login-card h2 {
-  color: #ffffff;
-  text-align: center;
-  font-size: 3.5rem;
-  margin: 0 0 2rem 0;
-  text-shadow:
-    -1px -1px 0 navy,
-    1px -1px 0 navy,
-    -1px 1px 0 navy,
-    1px 1px 0 navy;
+
+/* Logo card with improved styling */
+.logo-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(8, 35, 153, 0.95); /* Same solid background */
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  border: 3px solid var(--accent-color);
+  flex-grow: 1;  /* Keep the width ratio */
+  width: 40%;  /* Set width to 40% of the container */
+  max-width: 400px;  /* Add max-width for larger screens */
+  height: 100%;  /* Match height with login card */
 }
 
+.logo-image {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Input and button groups */
 .input-group {
   margin-bottom: 2rem;
   width: 100%;
@@ -93,6 +108,7 @@
   transform: translateY(-2px);
 }
 
+/* Error message styling */
 .error-message {
   color: #fee2e2;
   text-align: center;
@@ -102,15 +118,90 @@
   margin-top: 1rem;
 }
 
-/* Specific adjustments for 10.1-inch screen */
-@media screen and (max-width: 1024px) {
-  .login-card {
-    max-width: 500px;
-    padding: 2rem 2.5rem;
+/* Keypad styling with advanced effects */
+.keypad-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6); /* Darker background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(12px); /* Strong blur effect */
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out; /* Smooth fade-in */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
-  
-  .button-group {
+  to {
+    opacity: 1;
+  }
+}
+
+.keypad {
+  background: linear-gradient(135deg, #3498db, #8e44ad); /* Gradient background */
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  max-width: 360px;
+  justify-content: center;
+  animation: zoomIn 0.3s ease-out; /* Smooth zoom-in */
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.5);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.keypad-button {
+  width: 70px;
+  height: 70px;
+  font-size: 1.5rem;
+  background-color: #ffffff;
+  color: #3498db;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.keypad-button:hover {
+  background-color: #2980b9;
+  color: #fff;
+  transform: scale(1.1); /* Hover effect */
+}
+
+/* Blur effect for the rest of the page */
+.blurred {
+  filter: blur(8px); /* Slightly stronger blur */
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 1024px) {
+  .login-container-inner {
     flex-direction: column;
+  }
+
+  .logo-card {
+    margin-bottom: 1rem;
+    width: 100%; /* Full width on smaller screens */
+  }
+
+  .login-card {
+    width: 100%; /* Full width on smaller screens */
   }
 }
 
@@ -122,5 +213,14 @@
 
   .login-card h2 {
     font-size: 2.5rem;
+  }
+
+  .keypad {
+    padding: 1.5rem;
+  }
+
+  .keypad-button {
+    width: 60px;
+    height: 60px;
   }
 }

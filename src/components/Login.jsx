@@ -5,12 +5,14 @@ import { useAppContext } from '../context/AppContext';
 import BackgroundLogos from './BackgroundLogos';
 import Button from './Button';
 import '../styles/Login.css';
-import logoSrc from '/rcnnct.png';
+import logoSrc from '/rcnnct.png'; // Adjust the path as per your setup
+import cscLogo from '/CSC logo.png'; // Adjust the path as per your setup
 
 const Login = () => {
   const [userId, setUserId] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showKeypad, setShowKeypad] = useState(false); // State to toggle keypad
   const navigate = useNavigate();
   const { setUser, user } = useAppContext();
 
@@ -28,7 +30,7 @@ const Login = () => {
 
     try {
       const response = await apiService.kioskLogin(userId);
-      
+
       // Set user in context
       setUser({
         id: response.id,
@@ -43,24 +45,38 @@ const Login = () => {
     } catch (error) {
       console.error('Login error:', error);
       let errorMessage = 'An unexpected error occurred. Please try again.';
-      
+
       if (error.message.includes('Network Error')) {
         errorMessage = 'Network error. Please check your connection and try again.';
       } else if (error.response) {
         errorMessage = error.response.data?.detail || 'Login failed. Please try again.';
       }
-      
+
       setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
+  // Keypad input handler
+  const handleKeypadClick = (number) => {
+    setUserId(prev => prev + number);
+  };
+
+  // Input focus handler to open keypad
+  const handleInputFocus = () => {
+    setShowKeypad(true); // Open keypad on input focus
+  };
+
   return (
-    <div className="login-container">
+    <div className="login">
       <BackgroundLogos logoSrc={logoSrc} />
-      <div className="login-container-inner">
-        <div className="login-card">
+      <div className="login-container">
+        <div className="logo-card">
+          <img src={cscLogo} alt="CSC Logo" className="logo-image" />
+        </div>
+
+        <div className="right-card">
           <h2>Student Login</h2>
           <form onSubmit={handleSubmit}>
             <div className="input-group">
@@ -72,6 +88,7 @@ const Login = () => {
                 required
                 className="login-input"
                 disabled={loading}
+                onFocus={handleInputFocus} // Open keypad when the input is focused
               />
             </div>
             <div className="button-group">
@@ -86,6 +103,30 @@ const Login = () => {
             {error && <p className="error-message">{error}</p>}
           </form>
         </div>
+
+        {/* Keypad Pop-up */}
+        {showKeypad && (
+          <div className="keypad-overlay">
+            <div className="keypad fancy-keypad">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((num) => (
+                <button
+                  key={num}
+                  className="keypad-button"
+                  onClick={() => handleKeypadClick(num)}
+                >
+                  {num}
+                </button>
+              ))}
+              <Button
+                type="button"
+                className="login-button"
+                onClick={() => setShowKeypad(false)} // Close keypad
+              >
+                Close Keypad
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
