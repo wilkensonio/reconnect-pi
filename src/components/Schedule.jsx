@@ -1,4 +1,4 @@
-// src/components/Schedule.jsx
+// Schedule.jsx
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -43,10 +43,9 @@ const Schedule = () => {
   const navigate = useNavigate();
   const { user } = useAppContext();
   const facultyId = sessionStorage.getItem('selected_faculty_id');
-  const studentId = user?.student_id; // Retrieve studentId from user context
 
   useEffect(() => {
-    if (!facultyId || !studentId) {
+    if (!facultyId) {
       navigate('/', { replace: true });
       return;
     }
@@ -55,14 +54,21 @@ const Schedule = () => {
       try {
         const info = await apiService.getFacultyInfo(facultyId);
         setFacultyInfo(info);
+
+        // Fetch availability and appointments
+        const baseAvailability = await apiService.getAvailabilitiesByUser(facultyId);
+        setAvailableTimes(baseAvailability);
+
+        const existingAppointments = await apiService.getAppointmentsByUser(facultyId);
+        setAppointments(existingAppointments);
       } catch (error) {
-        console.error('Error fetching faculty info:', error);
-        setError('Failed to load faculty information');
+        console.error('Error fetching data:', error);
+        setError('Failed to load data');
       }
     };
 
     fetchData();
-  }, [facultyId, studentId, navigate]);
+  }, [facultyId, navigate]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -165,7 +171,7 @@ const Schedule = () => {
         start_time: selectedTime,
         end_time: endTimeString,
         reason,
-        student_id: studentId,
+        student_id: user?.student_id,
         faculty_id: facultyId
       };
 
@@ -174,7 +180,7 @@ const Schedule = () => {
       navigate('/view');
     } catch (error) {
       console.error('Error scheduling meeting:', error);
-      setError(error.message || 'Failed to schedule meeting. Please try again.');
+      setError(error.response?.data?.detail || 'Failed to schedule meeting. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -206,7 +212,6 @@ const Schedule = () => {
                 selectedDate={selectedDate}
                 onSelectDate={handleDateTimeSelect}
                 facultyId={facultyId}
-                studentId={studentId} // Pass studentId here
               />
             </div>
           </div>
