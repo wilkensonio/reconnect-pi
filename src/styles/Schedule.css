@@ -1,46 +1,40 @@
+/* Schedule.css */
+
 .schedule {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 50vh;
-  max-height: 100vh;
-  padding: 1rem;
+  min-height: 100vh;
+  width: 100vw;
+  position: relative;
 }
 
 .schedule-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
   width: 100%;
   max-width: 1400px;
-  padding: 0.5rem;
+  padding: 1rem;
+  box-sizing: border-box;
 }
 
-.schedule-card {
+.top-card,
+.left-card,
+.right-card {
   background-color: rgba(8, 35, 153, 0.849);
   border-radius: 16px;
-  padding: 1.5rem;
+  padding: 1.2rem;
+  margin: 0.5rem;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-  margin-bottom: 0.5rem;
-  border: 3px solid var(--accent-color);
+  border: 2px solid var(--accent-color);
   position: relative;
+  box-sizing: border-box;
 }
 
-.title-card, .schedule-form, .date-picker-card, .reason-card, .button-container {
-  position: relative;
-  z-index: 2;
-}
-
-.title-card {
-  width: 100%;
+.top-card {
   text-align: center;
-  margin-bottom: 0.5rem;
-}
-
-.schedule-title {
-  font-size: 3.5rem;
-  color: #ffffff;
-  margin: 0;
+  color: white;
+  font-size: 1.8rem;
   text-shadow:
     -1px -1px 0 navy,
     1px -1px 0 navy,
@@ -48,52 +42,45 @@
     1px 1px 0 navy;
 }
 
-.schedule-form {
+.content-cards {
   display: flex;
+  flex-wrap: nowrap;
   justify-content: space-between;
-  width: 100%;
-  gap: 0.5rem;
 }
 
-.date-picker-card {
-  width: 80%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+.left-card {
+  flex: 2;
+  margin-right: 0.5rem;
 }
 
-.reason-card {
-  width: 40%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding-top: 1.2rem;
+.right-card {
+  flex: 1;
+  margin-left: 0.5rem;
 }
 
-.date-picker-container {
-  width: 100%;
+.left-card h2,
+.right-card h2 {
+  color: white;
+  text-align: center;
+  font-size: 1.8rem;
+  margin: 0 0 1rem 0;
+  text-shadow:
+    -1px -1px 0 navy,
+    1px -1px 0 navy,
+    -1px 1px 0 navy,
+    1px 1px 0 navy;
 }
 
-.date-picker-container,
-.reason-container {
-  margin-bottom: 0.2rem;
+.calendar-wrapper {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
 }
 
-.reason-container label {
-  padding-bottom: 0.2rem;
-  font-weight: bold;
-  padding-top: 0.5rem;
-}
-
-.date-picker-container label {
-  flex-direction: column;
-}
-
-.date-picker-container label,
-.reason-container label {
+.input-group label {
   display: block;
   margin-bottom: 0.5rem;
-  font-size: 1.8rem;
+  font-size: 1.2rem;
   color: #ffffff;
   text-shadow:
     -1px -1px 0 navy,
@@ -102,63 +89,61 @@
     1px 1px 0 navy;
 }
 
-.input-dropdown-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.reason-input {
+.input-field {
   width: 100%;
-  height: 60px;
-  padding: 0.8rem 1rem;
-  font-size: 1.1rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.9rem;
   border: 1px solid var(--dropdown-border);
   border-radius: 8px;
   background-color: rgba(255, 255, 255, 0.2);
   color: #ffffff;
-  resize: vertical;
+  box-sizing: border-box;
 }
 
-.reason-input::placeholder {
+.input-field::placeholder {
   color: #ffffff;
   opacity: 0.7;
 }
 
-.predefined-messages {
-  display: block;
+.input-dropdown-container {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
   max-height: 130px;
   overflow-y: auto;
-  padding: 0.5rem;
   background-color: rgba(8, 35, 153, 0.85);
   border: 1px solid var(--accent-color);
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
 }
 
-.predefined-message {
-  padding: 0.8rem 1rem;
+.dropdown-item {
+  padding: 0.6rem 0.8rem;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #ffffff;
 }
 
-.predefined-message:hover {
-  background-color: var(--dropdown-hover);
+.dropdown-item:hover {
+  background-color: rgba(59, 131, 246, 0.959);
 }
 
-.button-container {
+.button-group {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding-bottom: 0.1rem;
+  gap: 0.8rem;
+  padding-top: 0.8rem;
 }
 
 .full-width-button {
   width: 100%;
-  font-size: 1.3rem;
-  padding: 1rem 1rem;
+  font-size: 1rem;
+  padding: 0.6rem 0.8rem;
   color: #ffffff;
   background-color: rgba(59, 131, 246, 0.959);
   border: 1px solid navy;
@@ -167,31 +152,30 @@
     1px -1px 0 navy,
     -1px 1px 0 navy,
     1px 1px 0 navy;
-}
-
-.large-button {
-  font-size: 1.5rem;
-  padding: 1.2rem 2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .full-width-button:hover {
   background-color: rgba(59, 130, 246, 1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-@media (max-width: 1024px) {
-  .schedule-container {
-    transform: scale(0.8);
-  }
+.submit-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
-@media (max-width: 768px) {
-  .schedule-container {
-    transform: scale(0.7);
-  }
+.error-message {
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 0.8rem;
+  border-radius: 8px;
+  text-align: center;
+  color: white;
+  margin: 0.8rem 0;
 }
 
-@media (max-width: 480px) {
-  .schedule-container {
-    transform: scale(0.6);
-  }
-}
+/* Adjusted font sizes and padding to make the components smaller and fit better on smaller screens */

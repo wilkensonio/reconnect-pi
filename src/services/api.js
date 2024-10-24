@@ -1,5 +1,4 @@
 import axios from 'axios';
-import qs from 'qs';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://ec2-3-82-206-23.compute-1.amazonaws.com:8000/api/v1';
 const apiKey = import.meta.env.VITE_API_KEY;
@@ -34,6 +33,7 @@ api.interceptors.response.use(
 );
 
 export const apiService = {
+  // Authentication
   async kioskLogin(userId) {
     try {
       const response = await api.post('/kiosk-signin/', { user_id: userId });
@@ -48,19 +48,22 @@ export const apiService = {
 
   async getAllFaculty() {
     try {
-      // For development, return sample data
-      return [{
-        id: "70578617",
-        first_name: "J",
-        last_name: "Escobar",
-        title: "Professor",
-        department: "Computer Science"
-      }];
-      // Uncomment when API endpoint is ready:
-      // const response = await api.get('/users/faculty/');
-      // return response.data;
+      const response = await api.get('/users/');
+      console.log('API Response:', response.data); // Debug log
+      return response.data;
     } catch (error) {
       console.error('Error fetching faculty members:', error);
+      throw error;
+    }
+  },
+  
+
+  async getFacultyInfo(facultyId) {
+    try {
+      const response = await api.get(`/user/id/${facultyId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching faculty info:', error);
       throw error;
     }
   },
@@ -75,17 +78,15 @@ export const apiService = {
     }
   },
 
-  async getStudentAppointments(studentId) {
+  async getAppointmentsByUser(userId) {
     try {
-      const response = await api.get(`/appointments/?student_id=${studentId}`);
+      const response = await api.get(`/appointments/get-by-user/${userId}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching student appointments:', error);
+      console.error('Error fetching appointments:', error);
       throw error;
     }
   },
-
-  // ... rest of your existing methods ...
 
   async createAppointment(appointmentData) {
     try {
@@ -100,27 +101,23 @@ export const apiService = {
     }
   },
 
-  async getFacultyInfo(facultyId) {
+  async deleteAppointment(appointmentId) {
     try {
-      const response = await api.get(`/user/id/${facultyId}`);
+      const response = await api.delete(`/appointment/delete/${appointmentId}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching faculty info:', error);
+      console.error('Error deleting appointment:', error);
       throw error;
     }
   },
 
-  async logout() {
+  logout() {
     try {
       localStorage.removeItem('reconnect_access_token');
       sessionStorage.removeItem('selected_faculty_id');
     } catch (error) {
       console.error('Logout error:', error);
     }
-  },
-
-  stringifyQuery(obj) {
-    return qs.stringify(obj);
   }
 };
 

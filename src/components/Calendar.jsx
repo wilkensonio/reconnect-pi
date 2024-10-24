@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { apiService } from '../services/api';
@@ -6,105 +6,190 @@ import '../styles/Calendar.css';
 
 const Calendar = ({ selectedDate, onSelectDate, facultyId }) => {
   const [availableTimes, setAvailableTimes] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+  const [selectedTime, setSelectedTime] = useState(null);
+  const [showDurationSelect, setShowDurationSelect] = useState(false);
   const [timeRange, setTimeRange] = useState({
     minTime: new Date(),
     maxTime: new Date()
   });
 
-  useEffect(() => {
-    const fetchAvailabilities = async () => {
-      try {
-        const availabilities = await apiService.getAvailabilitiesByUser(facultyId);
-        const times = availabilities.map(a => ({
-          day: a.day,
-          start_time: a.start_time,
-          end_time: a.end_time
-        }));
-        setAvailableTimes(times);
+  const fetchAvailability = useCallback(async () => {
+    if (!facultyId) return;
 
-        // Find the earliest start time and latest end time
+    try {
+      // Get faculty's base availability
+      const baseAvailability = await apiService.getAvailabilitiesByUser(facultyId);
+      
+      // Get existing appointments
+      const existingAppointments = await apiService.getAppointmentsByUser(facultyId);
+
+      setAvailableTimes(baseAvailability);
+      setAppointments(existingAppointments);
+
+      // Set time range based on faculty's availability
+      if (baseAvailability.length > 0) {
         let earliestStart = '23:59';
         let latestEnd = '00:00';
         
-        times.forEach(slot => {
+        baseAvailability.forEach(slot => {
           if (slot.start_time < earliestStart) earliestStart = slot.start_time;
           if (slot.end_time > latestEnd) latestEnd = slot.end_time;
         });
 
-        // Set time range
+        const minTime = new Date();
+        const maxTime = new Date();
+        
         const [startHours, startMinutes] = earliestStart.split(':').map(Number);
         const [endHours, endMinutes] = latestEnd.split(':').map(Number);
         
-        const minTime = new Date();
-        minTime.setHours(startHours, startMinutes);
+        minTime.setHours(startHours, startMinutes, 0);
+        maxTime.setHours(endHours, endMinutes, 0);
         
-        const maxTime = new Date();
-        maxTime.setHours(endHours, endMinutes);
-
         setTimeRange({ minTime, maxTime });
-      } catch (error) {
-        console.error('Error fetching availabilities:', error);
       }
-    };
-
-    if (facultyId) {
-      fetchAvailabilities();
+    } catch (error) {
+      console.error('Error fetching availability:', error);
     }
   }, [facultyId]);
 
-  const isDateAvailable = (date) => {
-    const dayOfWeek = date.toLocaleString('en-US', { weekday: 'long' });
-    return availableTimes.some(slot => dayOfWeek === slot.day);
+  useEffect(() => {
+    fetchAvailability();
+  }, [fetchAvailability]);
+
+  const isTimeSlotAvailable = (time) => {
+    if (!time) return false;
+    
+    // Don't show past times
+    if (time < new Date()) return false;
+
+    const dayOfWeek = time.toLocaleString('en-US', { weekday: 'long' });
+    const timeString = time.toTimeString().slice(0, 5);
+    const dateString = time.toISOString().split('T')[0];
+
+    // Check if faculty is available on this day/time
+    const dayAvailability = availableTimes.find(slot => slot.day === dayOfWeek);
+    if (!dayAvailability) return false;
+
+    // Check if time is within faculty's available hours
+    if (timeString < dayAvailability.start_time || timeString >= dayAvailability.end_time) {
+      return false;
+    }
+
+    // Check if time slot is already booked
+    return !appointments.some(apt => 
+      apt.date === dateString && 
+      timeString >= apt.start_time && 
+      timeString < apt.end_time
+    );
   };
 
-  const isTimeAvailable = (time) => {
-    const dayOfWeek = time.toLocaleString('en-US', { weekday: 'long' });
-    const selectedTimeString = time.toTimeString().slice(0, 5);
-    return availableTimes.some(slot =>
-      dayOfWeek === slot.day &&
-      selectedTimeString >= slot.start_time &&
-      selectedTimeString < slot.end_time
-    );
+  const handleTimeSelect = (time, event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const timeEl = event.target;
+    const rect = timeEl.getBoundingClientRect();
+
+    setSelectedTime(time);
+    setShowDurationSelect(true);
+
+    // Position duration select next to the time
+    const durationSelect = document.querySelector('.duration-select');
+    if (durationSelect) {
+      durationSelect.style.top = `${rect.top}px`;
+      durationSelect.style.left = `${rect.right + 10}px`;
+    }
+  };
+
+  const handleDurationSelect = (duration) => {
+    if (!selectedTime) return;
+
+    const endTime = new Date(selectedTime.getTime() + duration * 60000);
+    const startTimeString = selectedTime.toTimeString().slice(0, 5);
+    const endTimeString = endTime.toTimeString().slice(0, 5);
+    const dateString = selectedTime.toISOString().split('T')[0];
+
+    // Check if duration fits within availability and doesn't conflict
+    const dayOfWeek = selectedTime.toLocaleString('en-US', { weekday: 'long' });
+    const dayAvailability = availableTimes.find(slot => slot.day === dayOfWeek);
+
+    if (!dayAvailability || endTimeString > dayAvailability.end_time) {
+      alert('Selected duration exceeds available time');
+      return;
+    }
+
+    const hasConflict = appointments.some(apt => {
+      if (apt.date !== dateString) return false;
+      const aptStart = new Date(`${apt.date}T${apt.start_time}`);
+      const aptEnd = new Date(`${apt.date}T${apt.end_time}`);
+      return (selectedTime < aptEnd && endTime > aptStart);
+    });
+
+    if (hasConflict) {
+      alert('Selected duration conflicts with another appointment');
+      return;
+    }
+
+    onSelectDate({
+      date: selectedTime,
+      startTime: startTimeString,
+      endTime: endTimeString,
+      length: duration
+    });
+
+    setShowDurationSelect(false);
+    setSelectedTime(null);
+  };
+
+  const isDateAvailable = (date) => {
+    if (!date) return false;
+
+    // Don't show past dates
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    if (date < now) return false;
+
+    // Check if faculty is available on this day
+    const dayOfWeek = date.toLocaleString('en-US', { weekday: 'long' });
+    return availableTimes.some(slot => slot.day === dayOfWeek);
   };
 
   return (
     <div className="calendar-wrapper">
       <DatePicker
         selected={selectedDate}
-        onChange={onSelectDate}
+        onChange={date => {
+          setShowDurationSelect(false);
+          setSelectedTime(null);
+          onSelectDate({ date });
+        }}
         showTimeSelect
         inline
         timeFormat="HH:mm"
         timeIntervals={15}
         dateFormat="MMMM d, yyyy h:mm aa"
         calendarClassName="custom-calendar"
-        dayClassName={date => 
-          isDateAvailable(date) ? "available-date" : "unavailable-date react-datepicker__day--disabled"
+        dayClassName={date =>
+          isDateAvailable(date) ? "available-date" : "unavailable-date"
         }
-        timeClassName={time => 
-          isTimeAvailable(time) ? "available-time" : "unavailable-time"
+        timeClassName={time =>
+          isTimeSlotAvailable(time) ? "available-time" : "unavailable-time"
         }
         minTime={timeRange.minTime}
         maxTime={timeRange.maxTime}
-        filterTime={isTimeAvailable}
-        popperPlacement="bottom-start"
-        popperModifiers={[
-          {
-            name: "offset",
-            options: {
-              offset: [0, 10],
-            },
-          },
-          {
-            name: "preventOverflow",
-            options: {
-              rootBoundary: "viewport",
-              tether: false,
-              altAxis: true,
-            },
-          },
-        ]}
+        minDate={new Date()}
+        filterTime={isTimeSlotAvailable}
+        onTimeSelect={handleTimeSelect}
       />
+      
+      {showDurationSelect && selectedTime && (
+        <div className="duration-select">
+          <div className="duration-option" onClick={() => handleDurationSelect(15)}>15 minutes</div>
+          <div className="duration-option" onClick={() => handleDurationSelect(30)}>30 minutes</div>
+          <div className="duration-option" onClick={() => handleDurationSelect(45)}>45 minutes</div>
+        </div>
+      )}
     </div>
   );
 };

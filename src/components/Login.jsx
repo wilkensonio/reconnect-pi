@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { apiService } from '../services/api';
 import { useAppContext } from '../context/AppContext';
 import BackgroundLogos from './BackgroundLogos';
@@ -10,24 +10,26 @@ import logoSrc from '/rcnnct.png';
 const Login = () => {
   const [userId, setUserId] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-  const { setUser } = useAppContext();
-  const selectedFacultyId = sessionStorage.getItem('selected_faculty_id');
+  const { setUser, user } = useAppContext();
 
-  React.useEffect(() => {
-    if (!selectedFacultyId) {
-      navigate('/', { replace: true });
+  // If user is already logged in, redirect to faculty selection
+  useEffect(() => {
+    if (user) {
+      navigate('/select-faculty');
     }
-  }, [selectedFacultyId, navigate]);
+  }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
+
     try {
       const response = await apiService.kioskLogin(userId);
-      localStorage.setItem('reconnect_access_token', response.access_token);
       
+      // Set user in context
       setUser({
         id: response.id,
         student_id: response.student_id,
@@ -36,7 +38,8 @@ const Login = () => {
         email: response.email,
       });
 
-      navigate('/home', { replace: true });
+      // Navigate to faculty selection
+      navigate('/select-faculty', { replace: true });
     } catch (error) {
       console.error('Login error:', error);
       let errorMessage = 'An unexpected error occurred. Please try again.';
@@ -44,19 +47,13 @@ const Login = () => {
       if (error.message.includes('Network Error')) {
         errorMessage = 'Network error. Please check your connection and try again.';
       } else if (error.response) {
-        if (error.response.status === 403) {
-          errorMessage = 'Access forbidden. Please check your credentials.';
-        } else {
-          errorMessage = error.response.data.detail || error.response.statusText;
-        }
+        errorMessage = error.response.data?.detail || 'Login failed. Please try again.';
       }
+      
       setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const handleBackToFaculty = () => {
-    sessionStorage.removeItem('selected_faculty_id');
-    navigate('/', { replace: true });
   };
 
   return (
@@ -74,16 +71,16 @@ const Login = () => {
                 placeholder="Enter your Student ID or scan barcode"
                 required
                 className="login-input"
+                disabled={loading}
               />
             </div>
             <div className="button-group">
-              <Button type="submit" className="login-button">Login</Button>
               <Button 
-                type="button" 
-                onClick={handleBackToFaculty}
-                className="back-button"
+                type="submit" 
+                className="login-button"
+                disabled={loading}
               >
-                Change Faculty
+                {loading ? 'Logging in...' : 'Login'}
               </Button>
             </div>
             {error && <p className="error-message">{error}</p>}

@@ -13,15 +13,14 @@ const ProtectedRoute = ({ children }) => {
   const { user } = useAppContext();
   
   if (!user) {
-    const currentPath = window.location.pathname;
-    return <Navigate to="/login" replace state={{ from: currentPath }} />;
+    return <Navigate to="/login" replace />;
   }
 
-  // Check if faculty is selected for relevant routes
-  if (['/schedule', '/home'].includes(window.location.pathname)) {
+  // For routes that need faculty selection
+  if (['/schedule', '/home', '/view'].includes(window.location.pathname)) {
     const selectedFacultyId = sessionStorage.getItem('selected_faculty_id');
     if (!selectedFacultyId) {
-      return <Navigate to="/" replace />;
+      return <Navigate to="/select-faculty" replace />;
     }
   }
 
@@ -29,32 +28,57 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function AppRoutes() {
+  const { user } = useAppContext();
+
   return (
     <ErrorBoundary>
       <Routes>
-        <Route path="/" element={<FacultySelection />} />
+        {/* Redirect root to login or faculty selection based on auth status */}
+        <Route
+          path="/"
+          element={
+            user ? <Navigate to="/select-faculty" replace /> : <Navigate to="/login" replace />
+          }
+        />
+
+        {/* Public route */}
         <Route path="/login" element={<Login />} />
-        <Route path="/home" element={
-          <ProtectedRoute>
-            <ErrorBoundary>
+
+        {/* Protected routes */}
+        <Route
+          path="/select-faculty"
+          element={
+            <ProtectedRoute>
+              <FacultySelection />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute>
               <Home />
-            </ErrorBoundary>
-          </ProtectedRoute>
-        } />
-        <Route path="/schedule" element={
-          <ProtectedRoute>
-            <ErrorBoundary>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/schedule"
+          element={
+            <ProtectedRoute>
               <Schedule />
-            </ErrorBoundary>
-          </ProtectedRoute>
-        } />
-        <Route path="/view" element={
-          <ProtectedRoute>
-            <ErrorBoundary>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/view"
+          element={
+            <ProtectedRoute>
               <ViewAppointments />
-            </ErrorBoundary>
-          </ProtectedRoute>
-        } />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Catch all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </ErrorBoundary>
