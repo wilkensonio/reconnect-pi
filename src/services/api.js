@@ -1,3 +1,5 @@
+// src/services/api.js
+
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://ec2-3-82-206-23.compute-1.amazonaws.com:8000/api/v1';
@@ -56,7 +58,6 @@ export const apiService = {
       throw error;
     }
   },
-  
 
   async getFacultyInfo(facultyId) {
     try {
@@ -68,12 +69,12 @@ export const apiService = {
     }
   },
 
-  async getAvailabilitiesByUser(facultyId) {
+  async getAvailabilitiesByUser(userId) {
     try {
-      const response = await api.get(`/availability/get-by-user/${facultyId}`);
+      const response = await api.get(`/availability/get-by-user/${userId}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching faculty availabilities:', error);
+      console.error('Error fetching availabilities:', error);
       throw error;
     }
   },

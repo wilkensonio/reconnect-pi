@@ -56,6 +56,8 @@
 .right-card {
   flex: 1;
   margin-left: 0.5rem;
+  display: flex;                /* Added */
+  flex-direction: column;       /* Added */
 }
 
 .left-card h2,
@@ -137,7 +139,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
-  padding-top: 0.8rem;
+  margin-top: auto;             /* Added */
 }
 
 .full-width-button {
@@ -179,3 +181,10 @@
 }
 
 /* Adjusted font sizes and padding to make the components smaller and fit better on smaller screens */
+
+/* Added: Ensure the form inside .right-card takes up available space */
+.right-card form {
+  flex: 1;                      /* Added */
+  display: flex;               /* Added */
+  flex-direction: column;      /* Added */
+}
