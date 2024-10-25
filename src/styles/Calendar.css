@@ -133,7 +133,7 @@
 .custom-calendar .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item {
   padding: 8px 4px;
   font-size: 1.2rem;
-  color: #057ef0;
+  color: navy;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -150,7 +150,7 @@
 
 .unavailable-date {
   color: #999999 !important;
-  background-color: #f0f0f0 !important;
+  background-color: #f0f0f080 !important;
   cursor: not-allowed !important;
   opacity: 0.5 !important;
   pointer-events: none !important;

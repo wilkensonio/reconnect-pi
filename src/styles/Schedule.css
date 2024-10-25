@@ -21,7 +21,7 @@
 .top-card,
 .left-card,
 .right-card {
-  background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent background */
+  background-color: rgba(0, 0, 195, 0.2); /* Semi-transparent background */
   backdrop-filter: blur(10px); /* Apply blur effect */
   border-radius: 16px;
   padding: 1rem;
