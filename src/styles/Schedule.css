@@ -27,7 +27,7 @@
   padding: 1rem;
   margin: 0.5rem;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-  border: 2px solid rgba(255, 255, 255, 0.7); /* Semi-transparent border */
+  border: 3px solid rgba(255, 255, 255, 1); /* Semi-transparent border */
   position: relative;
   box-sizing: border-box;
 }
