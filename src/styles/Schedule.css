@@ -21,12 +21,13 @@
 .top-card,
 .left-card,
 .right-card {
-  background-color: rgba(8, 35, 153, 0.849);
+  background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent background */
+  backdrop-filter: blur(10px); /* Apply blur effect */
   border-radius: 16px;
   padding: 1.2rem;
   margin: 0.5rem;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-  border: 2px solid var(--accent-color);
+  border: 2px solid rgba(255, 255, 255, 0.3); /* Semi-transparent border */
   position: relative;
   box-sizing: border-box;
 }
@@ -56,8 +57,8 @@
 .right-card {
   flex: 1;
   margin-left: 0.5rem;
-  display: flex;                /* Added */
-  flex-direction: column;       /* Added */
+  display: flex;
+  flex-direction: column;
 }
 
 .left-card h2,
@@ -78,7 +79,6 @@
   overflow: hidden;
   position: relative;
 }
-
 
 .input-group label {
   display: block;
@@ -110,6 +110,7 @@
 
 .input-dropdown-container {
   position: relative;
+  padding: 0.6rem 0.8rem;
 }
 
 .dropdown-menu {
@@ -117,7 +118,7 @@
   top: calc(100% + 4px);
   left: 0;
   right: 0;
-  max-height: 130px;
+  max-height: 70px;
   overflow-y: auto;
   background-color: rgba(8, 35, 153, 0.85);
   border: 1px solid var(--accent-color);
@@ -130,7 +131,6 @@
   cursor: pointer;
   font-size: 0.9rem;
   color: #ffffff;
-  max-height: 10px;
 }
 
 .dropdown-item:hover {
@@ -141,7 +141,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
-  margin-top: auto;             /* Added */
+  margin-top: auto;
 }
 
 .full-width-button {
@@ -184,9 +184,9 @@
 
 /* Adjusted font sizes and padding to make the components smaller and fit better on smaller screens */
 
-/* Added: Ensure the form inside .right-card takes up available space */
+/* Ensure the form inside .right-card takes up available space */
 .right-card form {
-  flex: 1;                      /* Added */
-  display: flex;               /* Added */
-  flex-direction: column;      /* Added */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
