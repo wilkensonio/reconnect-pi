@@ -23,11 +23,11 @@
 .right-card {
   background-color: rgba(0, 0, 195, 0.2); /* Semi-transparent background */
   backdrop-filter: blur(10px); /* Apply blur effect */
-  border-radius: 16px;
+  border-radius: 25px;
   padding: 1rem;
   margin: 0.5rem;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-  border: 2px solid rgba(255, 255, 255, 0.3); /* Semi-transparent border */
+  border: 2px solid rgba(255, 255, 255, 0.7); /* Semi-transparent border */
   position: relative;
   box-sizing: border-box;
 }
