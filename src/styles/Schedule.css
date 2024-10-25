@@ -24,7 +24,7 @@
   background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent background */
   backdrop-filter: blur(10px); /* Apply blur effect */
   border-radius: 16px;
-  padding: 1.2rem;
+  padding: 1rem;
   margin: 0.5rem;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
   border: 2px solid rgba(255, 255, 255, 0.3); /* Semi-transparent border */
@@ -33,6 +33,7 @@
 }
 
 .top-card {
+  padding: .6rem;
   text-align: center;
   color: white;
   font-size: 1.8rem;
