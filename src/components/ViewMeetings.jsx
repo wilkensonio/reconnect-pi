@@ -6,6 +6,7 @@ import BackgroundLogos from './BackgroundLogos';
 import Button from './Button';
 import '../styles/ViewMeetings.css';
 import logoSrc from '/rcnnct.png';
+import LogoutButton from './LogoutButton';
 
 const ViewMeetings = () => {
   const [appointments, setAppointments] = useState([]);
@@ -198,6 +199,7 @@ const ViewMeetings = () => {
               Back to Home
             </Button>
           </div>
+          <LogoutButton/>
         </div>
       </div>
     </div>

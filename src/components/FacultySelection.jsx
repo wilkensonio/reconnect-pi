@@ -6,6 +6,7 @@ import BackgroundLogos from './BackgroundLogos';
 import Button from './Button';
 import '../styles/FacultySelection.css';
 import logoSrc from '/rcnnct.png';
+import LogoutButton from './LogoutButton';
 
 const FacultySelection = () => {
   const [faculty, setFaculty] = useState([]);

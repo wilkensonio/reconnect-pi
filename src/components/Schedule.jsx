@@ -9,6 +9,7 @@ import { apiService } from '../services/api';
 import { useAppContext } from '../context/AppContext';
 import '../styles/Schedule.css';
 import logoSrc from '/rcnnct.png';
+import LogoutButton from './LogoutButton';
 
 const predefinedMessages = [
   "Discuss project updates",
