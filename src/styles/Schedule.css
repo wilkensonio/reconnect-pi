@@ -79,6 +79,7 @@
   position: relative;
 }
 
+
 .input-group label {
   display: block;
   margin-bottom: 0.5rem;
@@ -129,6 +130,7 @@
   cursor: pointer;
   font-size: 0.9rem;
   color: #ffffff;
+  max-height: 10px;
 }
 
 .dropdown-item:hover {
