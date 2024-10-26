@@ -89,7 +89,7 @@
 
 .custom-calendar .react-datepicker__navigation--previous,
 .custom-calendar .react-datepicker__navigation--next {
-  top: 10%;
+  top: 9%;
   border-radius: 100%;
   width: 24px;
   max-height: 15px;
