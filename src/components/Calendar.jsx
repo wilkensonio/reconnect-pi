@@ -2,17 +2,21 @@ import React, { useState, useEffect, useCallback } from 'react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { apiService } from '../services/api';
+import { useAppContext } from '../context/AppContext';
 import '../styles/Calendar.css';
 
 const Calendar = ({ selectedDate, onSelectDate, facultyId }) => {
   const [availableTimes, setAvailableTimes] = useState([]);
   const [appointments, setAppointments] = useState([]);
+  const [studentAppointments, setStudentAppointments] = useState([]); // New state for student appointments
   const [selectedTime, setSelectedTime] = useState(null);
   const [showDurationSelect, setShowDurationSelect] = useState(false);
   const [timeRange, setTimeRange] = useState({
     minTime: new Date(),
     maxTime: new Date()
   });
+
+  const { user } = useAppContext();
 
   const fetchAvailability = useCallback(async () => {
     if (!facultyId) return;
@@ -21,11 +25,18 @@ const Calendar = ({ selectedDate, onSelectDate, facultyId }) => {
       // Get faculty's base availability
       const baseAvailability = await apiService.getAvailabilitiesByUser(facultyId);
       
-      // Get existing appointments
-      const existingAppointments = await apiService.getAppointmentsByUser(facultyId);
+      // Get faculty's existing appointments
+      const facultyAppointments = await apiService.getAppointmentsByUser(facultyId);
+
+      // Get student's existing appointments
+      let studentExistingAppointments = [];
+      if (user?.student_id) {
+        studentExistingAppointments = await apiService.getAppointmentsByUser(user.student_id);
+      }
 
       setAvailableTimes(baseAvailability);
-      setAppointments(existingAppointments);
+      setAppointments(facultyAppointments);
+      setStudentAppointments(studentExistingAppointments);
 
       // Set time range based on faculty's availability
       if (baseAvailability.length > 0) {
@@ -51,7 +62,7 @@ const Calendar = ({ selectedDate, onSelectDate, facultyId }) => {
     } catch (error) {
       console.error('Error fetching availability:', error);
     }
-  }, [facultyId]);
+  }, [facultyId, user?.student_id]);
 
   useEffect(() => {
     fetchAvailability();
@@ -76,30 +87,22 @@ const Calendar = ({ selectedDate, onSelectDate, facultyId }) => {
       return false;
     }
 
-    // Check if time slot is already booked
-    return !appointments.some(apt => 
+    // Check if time slot is already booked by faculty
+    const hasFacultyConflict = appointments.some(apt => 
       apt.date === dateString && 
       timeString >= apt.start_time && 
       timeString < apt.end_time
     );
-  };
 
-  const handleTimeSelect = (time, event) => {
-    event.preventDefault();
-    event.stopPropagation();
+    // Check if time slot conflicts with student's existing appointments
+    const hasStudentConflict = studentAppointments.some(apt => 
+      apt.date === dateString && 
+      timeString >= apt.start_time && 
+      timeString < apt.end_time
+    );
 
-    const timeEl = event.target;
-    const rect = timeEl.getBoundingClientRect();
-
-    setSelectedTime(time);
-    setShowDurationSelect(true);
-
-    // Position duration select next to the time
-    const durationSelect = document.querySelector('.duration-select');
-    if (durationSelect) {
-      durationSelect.style.top = `${rect.top}px`;
-      durationSelect.style.left = `${rect.right + 10}px`;
-    }
+    // Return true only if there are no conflicts
+    return !hasFacultyConflict && !hasStudentConflict;
   };
 
   const handleDurationSelect = (duration) => {
@@ -119,14 +122,23 @@ const Calendar = ({ selectedDate, onSelectDate, facultyId }) => {
       return;
     }
 
-    const hasConflict = appointments.some(apt => {
+    // Check for conflicts with faculty appointments
+    const hasFacultyConflict = appointments.some(apt => {
       if (apt.date !== dateString) return false;
       const aptStart = new Date(`${apt.date}T${apt.start_time}`);
       const aptEnd = new Date(`${apt.date}T${apt.end_time}`);
       return (selectedTime < aptEnd && endTime > aptStart);
     });
 
-    if (hasConflict) {
+    // Check for conflicts with student appointments
+    const hasStudentConflict = studentAppointments.some(apt => {
+      if (apt.date !== dateString) return false;
+      const aptStart = new Date(`${apt.date}T${apt.start_time}`);
+      const aptEnd = new Date(`${apt.date}T${apt.end_time}`);
+      return (selectedTime < aptEnd && endTime > aptStart);
+    });
+
+    if (hasFacultyConflict || hasStudentConflict) {
       alert('Selected duration conflicts with another appointment');
       return;
     }
@@ -157,9 +169,8 @@ const Calendar = ({ selectedDate, onSelectDate, facultyId }) => {
 
     // Check if there are available time slots for the specific date
     const dateString = date.toISOString().split('T')[0];
-    // For each availability slot, check if there's at least one available time
+    
     for (let slot of dayAvailability) {
-      // Generate start and end times for the slot
       const [startHour, startMinute] = slot.start_time.split(':').map(Number);
       const [endHour, endMinute] = slot.end_time.split(':').map(Number);
       const slotStart = new Date(date);
@@ -167,17 +178,16 @@ const Calendar = ({ selectedDate, onSelectDate, facultyId }) => {
       const slotEnd = new Date(date);
       slotEnd.setHours(endHour, endMinute, 0, 0);
 
-      // Iterate through the slot in 15-minute intervals
       let currentTime = new Date(slotStart);
       while (currentTime < slotEnd) {
         if (isTimeSlotAvailable(currentTime)) {
           return true; // At least one slot is available
         }
-        currentTime = new Date(currentTime.getTime() + 15 * 60000); // Increment by 15 minutes
+        currentTime = new Date(currentTime.getTime() + 15 * 60000);
       }
     }
 
-    return false; // No available slots found
+    return false;
   };
 
   return (
@@ -205,8 +215,6 @@ const Calendar = ({ selectedDate, onSelectDate, facultyId }) => {
         maxTime={timeRange.maxTime}
         minDate={new Date()}
         filterTime={isTimeSlotAvailable}
-        // Remove onTimeSelect as react-datepicker doesn't have this prop
-        // Instead, use onSelect with custom logic if needed
       />
       
       {showDurationSelect && selectedTime && (

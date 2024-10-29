@@ -1,5 +1,3 @@
-// Schedule.jsx
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Calendar from './Calendar';
@@ -37,7 +35,9 @@ const Schedule = () => {
   const [facultyInfo, setFacultyInfo] = useState(null);
   const [availableTimes, setAvailableTimes] = useState([]);
   const [appointments, setAppointments] = useState([]);
+  const [studentAppointments, setStudentAppointments] = useState([]);
   const [meetingDurations, setMeetingDurations] = useState([]);
+  const [blockedTimeSlots, setBlockedTimeSlots] = useState([]);
 
   const reasonDropdownRef = useRef(null);
   const durationDropdownRef = useRef(null);
@@ -56,12 +56,25 @@ const Schedule = () => {
         const info = await apiService.getFacultyInfo(facultyId);
         setFacultyInfo(info);
 
-        // Fetch availability and appointments
         const baseAvailability = await apiService.getAvailabilitiesByUser(facultyId);
         setAvailableTimes(baseAvailability);
 
-        const existingAppointments = await apiService.getAppointmentsByUser(facultyId);
-        setAppointments(existingAppointments);
+        const facultyAppointments = await apiService.getAppointmentsByUser(facultyId);
+        setAppointments(facultyAppointments);
+
+        // Get student appointments
+        if (user?.student_id) {
+          const studentExistingAppointments = await apiService.getAppointmentsByUser(user.student_id);
+          setStudentAppointments(studentExistingAppointments);
+
+          // Combine all blocked time slots
+          const allBlockedSlots = [...facultyAppointments, ...studentExistingAppointments].map(apt => ({
+            date: apt.date,
+            start: apt.start_time,
+            end: apt.end_time
+          }));
+          setBlockedTimeSlots(allBlockedSlots);
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
         setError('Failed to load data');
@@ -69,7 +82,7 @@ const Schedule = () => {
     };
 
     fetchData();
-  }, [facultyId, navigate]);
+  }, [facultyId, navigate, user?.student_id]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -85,6 +98,34 @@ const Schedule = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isReasonDropdownVisible, isDurationDropdownVisible]);
 
+  const isTimeSlotBlocked = (dateTime, duration) => {
+    const startTime = new Date(dateTime);
+    const endTime = new Date(startTime);
+    endTime.setMinutes(endTime.getMinutes() + duration);
+
+    const dateStr = startTime.toISOString().split('T')[0];
+    const timeStr = startTime.toTimeString().slice(0, 5);
+
+    return blockedTimeSlots.some(blocked => {
+      if (blocked.date !== dateStr) return false;
+
+      const [blockStartHours, blockStartMinutes] = blocked.start.split(':').map(Number);
+      const [blockEndHours, blockEndMinutes] = blocked.end.split(':').map(Number);
+
+      const blockStart = new Date(startTime);
+      blockStart.setHours(blockStartHours, blockStartMinutes, 0, 0);
+
+      const blockEnd = new Date(startTime);
+      blockEnd.setHours(blockEndHours, blockEndMinutes, 0, 0);
+
+      return (
+        (startTime < blockEnd && endTime > blockStart) || // Check if times overlap
+        (startTime >= blockStart && startTime < blockEnd) || // Check if start time is within blocked period
+        (endTime > blockStart && endTime <= blockEnd) // Check if end time is within blocked period
+      );
+    });
+  };
+
   const handleDateTimeSelect = ({ date }) => {
     setSelectedDate(date);
     setSelectedTime(date.toTimeString().slice(0,5));
@@ -94,12 +135,10 @@ const Schedule = () => {
   };
 
   const computePossibleDurations = (selectedDateTime) => {
-    // Get the faculty's availability on that day
     const dayOfWeek = selectedDateTime.toLocaleString('en-US', { weekday: 'long' });
     const dayAvailability = availableTimes.find(slot => slot.day === dayOfWeek);
     if (!dayAvailability) return;
 
-    // Get the start and end times of the availability
     const [startHours, startMinutes] = dayAvailability.start_time.split(':').map(Number);
     const [endHours, endMinutes] = dayAvailability.end_time.split(':').map(Number);
 
@@ -109,41 +148,19 @@ const Schedule = () => {
     const availabilityEnd = new Date(selectedDateTime);
     availabilityEnd.setHours(endHours, endMinutes, 0, 0);
 
-    // Get the selected time
     const selectedTime = new Date(selectedDateTime);
-    const [selectedHours, selectedMinutes] = selectedTime.toTimeString().slice(0,5).split(':').map(Number);
+    const [selectedHours, selectedMinutes] = selectedDateTime.toTimeString().slice(0,5).split(':').map(Number);
     selectedTime.setHours(selectedHours, selectedMinutes, 0, 0);
 
-    // Get existing appointments on that date
-    const dateString = selectedDateTime.toISOString().split('T')[0];
-    const appointmentsOnDate = appointments.filter(apt => apt.date === dateString);
-
-    // Sort appointments by start time
-    appointmentsOnDate.sort((a, b) => a.start_time.localeCompare(b.start_time));
-
-    // Find the next appointment after the selected time
-    let nextAppointment = null;
-    for (let apt of appointmentsOnDate) {
-      const aptStart = new Date(`${apt.date}T${apt.start_time}`);
-      if (aptStart > selectedTime) {
-        nextAppointment = aptStart;
-        break;
-      }
-    }
-
-    // Determine the latest possible end time
-    let latestEndTime = availabilityEnd;
-    if (nextAppointment) {
-      latestEndTime = nextAppointment;
-    }
-
-    // Calculate the maximum duration
-    const maxDurationMs = latestEndTime - selectedTime;
+    // Calculate the maximum possible duration
+    const maxDurationMs = availabilityEnd - selectedTime;
     const maxDurationMinutes = Math.floor(maxDurationMs / 60000);
 
-    // Define possible durations
+    // Define possible durations and filter out blocked ones
     const durations = [15, 30, 45, 60];
-    const possibleDurations = durations.filter(duration => duration <= maxDurationMinutes)
+    const possibleDurations = durations
+      .filter(duration => duration <= maxDurationMinutes)
+      .filter(duration => !isTimeSlotBlocked(selectedTime, duration))
       .map(duration => ({ label: `${duration} minutes`, value: duration }));
 
     setMeetingDurations(possibleDurations);
@@ -213,6 +230,8 @@ const Schedule = () => {
                 selectedDate={selectedDate}
                 onSelectDate={handleDateTimeSelect}
                 facultyId={facultyId}
+                blockedTimeSlots={blockedTimeSlots}
+                availableTimes={availableTimes}
               />
             </div>
           </div>
