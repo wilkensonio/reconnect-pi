@@ -138,18 +138,6 @@
 .delete-button {
   background-color: rgba(239, 68, 68, 0.8);
   color: white;
-  padding: 0.8rem 1.2rem;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.2s ease;
-  text-shadow:
-    -1px -1px 0 navy,
-    1px -1px 0 navy,
-    -1px 1px 0 navy,
-    1px 1px 0 navy;
-  margin-left: 1rem;
 }
 
 .delete-button:hover {
@@ -184,6 +172,51 @@
   background-color: rgba(100, 116, 139, 1);
   transform: translateY(-2px);
 }
+
+.button-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.check-in-button {
+  background-color: rgba(34, 197, 94, 0.8);
+  color: white;
+}
+
+.check-in-button:hover:not(:disabled) {
+  background-color: rgba(34, 197, 94, 1);
+  transform: translateY(-2px);
+}
+
+.check-in-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.checked-in-status {
+  color: #4ade80;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.check-in-button,
+.delete-button {
+  flex: 1;
+  box-sizing: border-box;
+  padding: 0.8rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  text-shadow:
+    -1px -1px 0 navy,
+    1px -1px 0 navy,
+    -1px 1px 0 navy,
+    1px 1px 0 navy;
+}
+
 
 .loading-container {
   text-align: center;
@@ -256,6 +289,18 @@
   }
 
   .delete-button {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .button-group {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .check-in-button {
     width: 100%;
     margin-left: 0;
   }

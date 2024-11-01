@@ -14,6 +14,7 @@ const ViewMeetings = () => {
   const [error, setError] = useState(null);
   const [facultyInfo, setFacultyInfo] = useState({});
   const [deletingId, setDeletingId] = useState(null);
+  const [checkingInId, setCheckingInId] = useState(null);
   const navigate = useNavigate();
   const { user } = useAppContext();
 
@@ -25,6 +26,12 @@ const ViewMeetings = () => {
       console.error(`Error fetching faculty info for ID ${facultyId}:`, error);
       return null;
     }
+  };
+
+  const getLocalDateTime = (dateString, timeString = '00:00') => {
+    const [year, month, day] = dateString.split('-').map(Number);
+    const [hours, minutes] = timeString.split(':').map(Number);
+    return new Date(year, month - 1, day, hours, minutes);
   };
 
   const fetchAppointments = async () => {
@@ -63,6 +70,8 @@ const ViewMeetings = () => {
 
       setFacultyInfo(facultyInfoMap);
       setAppointments(sortedAppointments);
+      console.log('Fetched Appointments:', sortedAppointments); // Add this line
+
       setError(null);
     } catch (error) {
       console.error('Error fetching appointments:', error);
@@ -84,8 +93,6 @@ const ViewMeetings = () => {
     try {
       setDeletingId(appointmentId);
       await apiService.deleteAppointment(appointmentId);
-      
-      // Refresh appointments list
       await fetchAppointments();
     } catch (error) {
       console.error('Error canceling appointment:', error);
@@ -95,8 +102,32 @@ const ViewMeetings = () => {
     }
   };
 
+  const handleCheckin = async (appointmentId) => {
+    try {
+      setCheckingInId(appointmentId);
+      await apiService.studentCheckin(appointmentId);
+      await fetchAppointments();
+    } catch (error) {
+      console.error('Error checking in:', error);
+      setError('Failed to check in. Please try again.');
+    } finally {
+      setCheckingInId(null);
+    }
+  };
+
+  const canCheckIn = (appointment) => {
+    const appointmentDateTime = getLocalDateTime(appointment.date, appointment.start_time);
+    const now = new Date();
+    const checkInWindow = new Date(appointmentDateTime.getTime() - 15 * 60000); // 15 minutes before
+    return now >= checkInWindow && !appointment.checked_in;
+  };
+
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
+    console.log('Formatting Date:', dateString);
+
+    const date = getLocalDateTime(dateString);
+    console.log('Parsed Date Object:', date);
+
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -180,14 +211,28 @@ const ViewMeetings = () => {
                       <div className="appointment-reason">
                         <strong>Reason:</strong> {appointment.reason}
                       </div>
+                      {appointment.checked_in && (
+                        <div className="checked-in-status">✓ Checked In</div>
+                      )}
                     </div>
-                    <Button
-                      onClick={() => handleDelete(appointment.id)}
-                      className="cancel-button"
-                      disabled={deletingId === appointment.id}
-                    >
-                      {deletingId === appointment.id ? 'Canceling...' : 'Cancel'}
-                    </Button>
+                    <div className="button-group">
+                      {/*canCheckIn(appointment) && ( */}
+                        <Button
+                          onClick={() => handleCheckin(appointment.id)}
+                          className="check-in-button"
+                          disabled={checkingInId === appointment.id}
+                        >
+                          {checkingInId === appointment.id ? 'Checking in...' : 'Check In'}
+                        </Button>
+                      {/*)} */}
+                      <Button
+                        onClick={() => handleDelete(appointment.id)}
+                        className="delete-button"
+                        disabled={deletingId === appointment.id}
+                      >
+                        {deletingId === appointment.id ? 'Canceling...' : 'Cancel'}
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>

@@ -1,5 +1,4 @@
 // src/services/api.js
-
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://ec2-3-82-206-23.compute-1.amazonaws.com:8000/api/v1';
@@ -48,6 +47,7 @@ export const apiService = {
     }
   },
 
+  // Faculty
   async getAllFaculty() {
     try {
       const response = await api.get('/users/');
@@ -69,6 +69,7 @@ export const apiService = {
     }
   },
 
+  // Availability
   async getAvailabilitiesByUser(userId) {
     try {
       const response = await api.get(`/availability/get-by-user/${userId}`);
@@ -79,6 +80,7 @@ export const apiService = {
     }
   },
 
+  // Appointments
   async getAppointmentsByUser(userId) {
     try {
       const response = await api.get(`/appointments/get-by-user/${userId}`);
@@ -112,6 +114,52 @@ export const apiService = {
     }
   },
 
+  // Student Check-in
+  async studentCheckin(appointmentId) {
+    try {
+      const response = await api.post(`/student/checkin/${appointmentId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error checking in:', error);
+      if (error.response && error.response.data) {
+        throw new Error(error.response.data.detail || 'Failed to check in');
+      }
+      throw error;
+    }
+  },
+
+  // PI Messages
+  async getAllPiMessages() {
+    try {
+      const response = await api.get('/pi-message/get-all');
+      return Array.isArray(response.data) ? response.data : [];
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        return [];
+      }
+      console.error('Error fetching PI messages:', error);
+      throw error;
+    }
+  },
+
+  async getPiMessage(userId) {
+    try {
+      const response = await api.get(`/pi-message/get/${userId}`);
+      return response.data;
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        return null;
+      }
+      console.error('Error fetching PI message:', error);
+      throw error;
+    }
+  },
+
+  
+
+  
+
+  // Session Management
   logout() {
     try {
       localStorage.removeItem('reconnect_access_token');
