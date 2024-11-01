@@ -1,4 +1,3 @@
-// src/services/api.js
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://ec2-3-82-206-23.compute-1.amazonaws.com:8000/api/v1';
@@ -51,7 +50,6 @@ export const apiService = {
   async getAllFaculty() {
     try {
       const response = await api.get('/users/');
-      console.log('API Response:', response.data); // Debug log
       return response.data;
     } catch (error) {
       console.error('Error fetching faculty members:', error);
@@ -155,9 +153,15 @@ export const apiService = {
     }
   },
 
-  
-
-  
+  async deletePiMessage(userId) {
+    try {
+      const response = await api.delete(`/pi-message/delete/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting PI message:', error);
+      throw error;
+    }
+  },
 
   // Session Management
   logout() {
