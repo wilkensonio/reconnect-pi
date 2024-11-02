@@ -140,11 +140,11 @@
 }
 
 .message-button.next.with-previous {
-    width: 180px;
+    width: 120px;
 }
 
 .message-button.previous {
-    width: 140px;
+    width: 120px;
     background-color: #e74c3c;
     color: white;
 }

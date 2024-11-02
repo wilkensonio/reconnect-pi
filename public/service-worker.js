@@ -1,14 +1,26 @@
 // service-worker.js
 const CACHE_NAME = 'reconnect-kiosk-static-v1';
 const FONT_CACHE_NAME = 'google-fonts-cache';
+const FA_CACHE_NAME = 'font-awesome-cache';
+
+const FONT_FILE_TYPES = ['.woff2', '.woff', '.ttf', '.eot'];
+const FONT_MIME_TYPES = {
+    '.woff2': 'application/font-woff2',
+    '.woff': 'application/font-woff',
+    '.ttf': 'font/ttf',
+    '.eot': 'application/vnd.ms-fontobject'
+};
+
+const ALLOWED_DOMAINS = new Set([
+    'fonts.googleapis.com', 
+    'fonts.gstatic.com',
+    'cdnjs.cloudflare.com'
+]);
 
 const STATIC_ASSETS = [
-    // Images
     '/reconnect.png',
     '/rcnnct.png',
     '/CSC logo.png',
-
-    // Styles
     '/src/styles/index.css',
     '/src/styles/App.css',
     '/src/styles/BackgroundLogos.css',
@@ -23,19 +35,15 @@ const STATIC_ASSETS = [
     '/src/styles/PiMessageModal.css',
     '/src/styles/Schedule.css',
     '/src/styles/ViewMeetings.css',
-
-    // External CSS
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css'
 ];
-
-// Font configurations
-const FONT_DOMAINS = new Set(['fonts.googleapis.com', 'fonts.gstatic.com']);
 
 self.addEventListener('install', event => {
     event.waitUntil(
         Promise.all([
             caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_ASSETS)),
-            caches.open(FONT_CACHE_NAME)
+            caches.open(FONT_CACHE_NAME),
+            caches.open(FA_CACHE_NAME)
         ])
     );
     self.skipWaiting();
@@ -47,7 +55,7 @@ self.addEventListener('activate', event => {
             .then(cacheNames => {
                 return Promise.all(
                     cacheNames
-                        .filter(name => name !== CACHE_NAME && name !== FONT_CACHE_NAME)
+                        .filter(name => ![CACHE_NAME, FONT_CACHE_NAME, FA_CACHE_NAME].includes(name))
                         .map(name => caches.delete(name))
                 );
             })
@@ -58,44 +66,57 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
 
-    // Skip non-GET requests
     if (event.request.method !== 'GET') return;
 
-    // Handle font requests
-    if (FONT_DOMAINS.has(url.hostname)) {
+    // Check if request is for a font file
+    const fontExtension = FONT_FILE_TYPES.find(ext => url.pathname.endsWith(ext));
+    const isFontFile = !!fontExtension;
+    
+    if (ALLOWED_DOMAINS.has(url.hostname) || isFontFile) {
         event.respondWith(
-            caches.open(FONT_CACHE_NAME)
-                .then(cache => cache.match(event.request))
-                .then(response => {
-                    if (response) return response;
+            caches.match(event.request)
+                .then(cachedResponse => {
+                    if (cachedResponse) {
+                        return cachedResponse;
+                    }
 
                     return fetch(event.request.clone(), {
-                        mode: 'cors',
                         credentials: 'omit',
-                        headers: {
+                        mode: 'cors',
+                        headers: new Headers({
                             'Origin': self.location.origin
-                        }
+                        })
                     }).then(response => {
-                        // Cache only if response is valid
                         if (response && response.ok) {
-                            caches.open(FONT_CACHE_NAME)
-                                .then(cache => cache.put(event.request, response.clone()));
+                            const cacheName = url.hostname === 'cdnjs.cloudflare.com' 
+                                ? FA_CACHE_NAME 
+                                : FONT_CACHE_NAME;
+                            
+                            const responseToCache = response.clone();
+                            caches.open(cacheName).then(cache => {
+                                cache.put(event.request, responseToCache);
+                            });
+                            return response;
                         }
                         return response;
                     }).catch(() => {
-                        return new Response('', {
-                            status: 200,
-                            headers: new Headers({
-                                'Content-Type': 'text/plain',
-                            })
-                        });
+                        if (isFontFile) {
+                            return new Response('', {
+                                status: 200,
+                                headers: new Headers({
+                                    'Content-Type': FONT_MIME_TYPES[fontExtension] || 'application/octet-stream',
+                                    'Access-Control-Allow-Origin': '*'
+                                })
+                            });
+                        }
+                        throw new Error('Font fetch failed');
                     });
                 })
         );
         return;
     }
 
-    // Handle other assets
+    // Handle other static assets
     event.respondWith(
         caches.match(event.request)
             .then(cachedResponse => {
@@ -109,7 +130,6 @@ self.addEventListener('fetch', event => {
                             return response;
                         }
 
-                        // Cache successful responses for static assets
                         if (STATIC_ASSETS.some(asset => url.pathname.endsWith(asset))) {
                             caches.open(CACHE_NAME)
                                 .then(cache => cache.put(event.request, response.clone()));

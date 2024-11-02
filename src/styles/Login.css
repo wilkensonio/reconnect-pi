@@ -32,11 +32,29 @@
   align-items: center;
   padding: 1rem;
   border-right: 2px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.logo-section::before {
+  content: '';
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 10px;
+  z-index: 0;
 }
 
 .logo-image {
   max-width: 200px;
   height: auto;
+  z-index: 1;
+  position: relative;
 }
 
 .login-section {
@@ -268,3 +286,21 @@
     font-size: 1.8rem;
   }
 }
+.login-container {
+  animation: fadeIn 0.5s ease-in;
+  animation-fill-mode: both;
+  animation-delay: 0.2s; /* Slight delay to let logos fade first */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
