@@ -46,6 +46,11 @@ body {
   position: relative;
   will-change: transform;
   background-color: var(--background-color);
+  transition: opacity 0.5s ease-out;
+}
+
+body.logging-out .App {
+  opacity: 0;
 }
 
 .loading-screen {
@@ -162,11 +167,33 @@ html {
     to { transform: translateX(0); }
 }
 
-/* Remove these classes */
-.page-transition,
-.route-enter,
-.route-enter-active,
-.route-exit,
+.page-transition {
+  position: relative;
+  width: 100%;
+}
+
+.route-enter {
+  position: absolute;
+  opacity: 0;
+  transform: translateY(20px);
+  width: 100%;
+}
+
+.route-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms ease-in-out, transform 300ms ease-in-out;
+}
+
+.route-exit {
+  position: absolute;
+  opacity: 1;
+  transform: translateY(0);
+  width: 100%;
+}
+
 .route-exit-active {
-    display: none;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 300ms ease-in-out, transform 300ms ease-in-out;
 }

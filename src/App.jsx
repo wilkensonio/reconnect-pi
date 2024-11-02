@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, useMemo } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { AppProvider, useAppContext } from './context/AppContext';
 import { apiService } from './services/api';
@@ -9,6 +9,7 @@ import Login from './components/Login';
 import Schedule from './components/Schedule';
 import ViewAppointments from './components/ViewMeetings';
 import PiMessageModal from './components/PiMessageModal';
+import Loading from './components/Loading';
 import './styles/App.css';
 
 const MESSAGE_TIME_PREFIX = 'pi_message_time_';
@@ -17,6 +18,10 @@ const ProtectedRoute = ({ children }) => {
     const { user } = useAppContext();
     
     if (!user) {
+        document.body.classList.add('logging-out');
+        setTimeout(() => {
+            document.body.classList.remove('logging-out');
+        }, 500); // Changed to 1000ms for longer transition
         return <Navigate to="/login" replace />;
     }
     
@@ -33,11 +38,10 @@ function AppRoutes() {
     const { user } = useAppContext();
     const [showMessages, setShowMessages] = useState(true);
     const [messages, setMessages] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    // Modified storage clearing that preserves message timing data
     useEffect(() => {
         const preserveStorage = () => {
-            // Save items to keep
             const preservedItems = {
                 auth: {
                     token: localStorage.getItem('reconnect_access_token'),
@@ -46,18 +50,15 @@ function AppRoutes() {
                 messageTimings: {}
             };
 
-            // Save all message timing data
             Object.keys(localStorage).forEach(key => {
                 if (key.startsWith(MESSAGE_TIME_PREFIX)) {
                     preservedItems.messageTimings[key] = localStorage.getItem(key);
                 }
             });
 
-            // Clear storage
             localStorage.clear();
             sessionStorage.clear();
 
-            // Restore preserved items
             if (preservedItems.auth.token) {
                 localStorage.setItem('reconnect_access_token', preservedItems.auth.token);
             }
@@ -65,7 +66,6 @@ function AppRoutes() {
                 sessionStorage.setItem('selected_faculty_id', preservedItems.auth.facultyId);
             }
 
-            // Restore message timing data
             Object.entries(preservedItems.messageTimings).forEach(([key, value]) => {
                 localStorage.setItem(key, value);
             });
@@ -75,11 +75,13 @@ function AppRoutes() {
     }, []);
 
     useEffect(() => {
+        let mounted = true;
         const checkForMessages = async () => {
             try {
                 const response = await apiService.getAllPiMessages();
+                if (!mounted) return;
+                
                 if (response && Array.isArray(response) && response.length > 0) {
-                    // Update messages only if they've changed
                     setMessages(prevMessages => {
                         if (JSON.stringify(prevMessages) !== JSON.stringify(response)) {
                             return response;
@@ -91,74 +93,115 @@ function AppRoutes() {
                 }
             } catch (error) {
                 console.error('Error checking messages:', error);
-                setShowMessages(false);
+                if (mounted) setShowMessages(false);
+            } finally {
+                if (mounted) setIsLoading(false);
             }
         };
 
         checkForMessages();
         const messageInterval = setInterval(checkForMessages, 1000);
-        return () => clearInterval(messageInterval);
+        
+        return () => {
+            mounted = false;
+            clearInterval(messageInterval);
+        };
     }, []);
 
-    if (showMessages && messages.length > 0) {
-        return <PiMessageModal 
-            messages={messages} 
-            onClose={() => setShowMessages(false)}
-        />;
+    if (isLoading) {
+        return <Loading message="Loading..." />;
     }
 
     return (
-        <Routes>
-            <Route
-                path="/"
-                element={
-                    user ? <Navigate to="/select-faculty" replace /> : <Navigate to="/login" replace />
-                }
-            />
-            <Route path="/login" element={<Login />} />
-            <Route
-                path="/select-faculty"
-                element={
-                    <ProtectedRoute>
-                        <FacultySelection />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/home"
-                element={
-                    <ProtectedRoute>
-                        <Home />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/schedule"
-                element={
-                    <ProtectedRoute>
-                        <Schedule />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/view"
-                element={
-                    <ProtectedRoute>
-                        <ViewAppointments />
-                    </ProtectedRoute>
-                }
-            />
-            <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <Suspense fallback={<Loading message="Loading..." />}>
+            {showMessages && messages.length > 0 ? (
+                <PiMessageModal 
+                    messages={messages} 
+                    onClose={() => setShowMessages(false)}
+                />
+            ) : (
+                <Routes>
+                    <Route
+                        path="/"
+                        element={
+                            user ? <Navigate to="/select-faculty" replace /> : <Navigate to="/login" replace />
+                        }
+                    />
+                    <Route path="/login" element={<Login />} />
+                    <Route
+                        path="/select-faculty"
+                        element={
+                            <ProtectedRoute>
+                                <FacultySelection />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/home"
+                        element={
+                            <ProtectedRoute>
+                                <Home />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/schedule"
+                        element={
+                            <ProtectedRoute>
+                                <Schedule />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/view"
+                        element={
+                            <ProtectedRoute>
+                                <ViewAppointments />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+            )}
+        </Suspense>
     );
 }
 
 function App() {
+    const [waitingWorker, setWaitingWorker] = useState(null);
+
+    useEffect(() => {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.ready.then(registration => {
+                registration.addEventListener('waiting', event => {
+                    if (event.target.state === 'waiting') {
+                        setWaitingWorker(event.target);
+                    }
+                });
+            });
+        }
+    }, []);
+
+    const updateServiceWorker = () => {
+        waitingWorker?.postMessage('skipWaiting');
+        window.location.reload();
+    };
+
     return (
         <AppProvider>
             <Router>
                 <div className="App">
-                    <AppRoutes />
+                    <ErrorBoundary>
+                        <AppRoutes />
+                    </ErrorBoundary>
+                    {waitingWorker && (
+                        <div className="update-toast">
+                            New version available!
+                            <button onClick={updateServiceWorker}>
+                                Update
+                            </button>
+                        </div>
+                    )}
                 </div>
             </Router>
         </AppProvider>
