@@ -31,6 +31,7 @@ export const AppProvider = ({ children }) => {
       console.error('Error during logout:', error);
     }
   };
+  
 
   const selectFaculty = (facultyId) => {
     sessionStorage.setItem('selected_faculty_id', facultyId);

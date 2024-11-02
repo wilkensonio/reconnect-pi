@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Button from './Button';
 import BackgroundLogos from './BackgroundLogos';
 import { apiService } from '../services/api';
 import '../styles/PiMessageModal.css';
@@ -38,7 +37,6 @@ const PiMessageModal = ({ messages, onClose }) => {
         return expiryTime;
     };
 
-    // Initialize or update messages
     useEffect(() => {
         if (!messages || messages.length === 0) {
             setActiveMessages([]);
@@ -88,7 +86,6 @@ const PiMessageModal = ({ messages, onClose }) => {
         }
     }, [messages, currentIndex]);
 
-    // Check for expired messages and handle deletion
     useEffect(() => {
         if (!activeMessages || activeMessages.length === 0) return;
 
@@ -129,18 +126,6 @@ const PiMessageModal = ({ messages, onClose }) => {
         return () => clearInterval(interval);
     }, [activeMessages, currentIndex, onClose]);
 
-    const handleNext = () => {
-        setCurrentIndex(prev => 
-            prev === activeMessages.length - 1 ? prev : prev + 1
-        );
-    };
-
-    const handlePrevious = () => {
-        setCurrentIndex(prev => 
-            prev === 0 ? prev : prev - 1
-        );
-    };
-
     if (!activeMessages || activeMessages.length === 0) {
         return null;
     }
@@ -150,6 +135,9 @@ const PiMessageModal = ({ messages, onClose }) => {
         return null;
     }
 
+    const isLastMessage = currentIndex === activeMessages.length - 1;
+    const showPreviousButton = currentIndex > 0;
+
     return (
         <div className="message-page">
             <BackgroundLogos logoSrc="/rcnnct.png" />
@@ -158,15 +146,6 @@ const PiMessageModal = ({ messages, onClose }) => {
                     <div className="message-content">
                         <h2>Important Messages</h2>
                         <div className="message-text-container">
-                            {activeMessages.length > 1 && (
-                                <button
-                                    className="nav-button prev"
-                                    onClick={handlePrevious}
-                                    disabled={currentIndex === 0}
-                                >
-                                    ‹
-                                </button>
-                            )}
                             <div className="message-text">
                                 <div className="message-info">
                                     <span className="message-from">
@@ -175,16 +154,8 @@ const PiMessageModal = ({ messages, onClose }) => {
                                 </div>
                                 {currentMessage.message}
                             </div>
-                            {activeMessages.length > 1 && (
-                                <button
-                                    className="nav-button next"
-                                    onClick={handleNext}
-                                    disabled={currentIndex === activeMessages.length - 1}
-                                >
-                                    ›
-                                </button>
-                            )}
                         </div>
+                        
                         {activeMessages.length > 1 && (
                             <div className="message-pagination">
                                 {activeMessages.map((_, index) => (
@@ -196,18 +167,38 @@ const PiMessageModal = ({ messages, onClose }) => {
                                 ))}
                             </div>
                         )}
+
                         <div className="message-footer">
                             <div className="message-counter">
                                 {activeMessages.length > 1 && 
                                     `Message ${currentIndex + 1} of ${activeMessages.length}`
                                 }
                             </div>
-                            <Button
-                                onClick={currentIndex === activeMessages.length - 1 ? onClose : handleNext}
-                                className="login-button"
-                            >
-                                {currentIndex === activeMessages.length - 1 ? 'Continue to Login' : 'Next Message'}
-                            </Button>
+                            <div className="button-container-message">
+                                {showPreviousButton ? (
+                                    <>
+                                        <button
+                                            onClick={() => setCurrentIndex(prev => prev - 1)}
+                                            className="message-button previous"
+                                        >
+                                            Previous
+                                        </button>
+                                        <button
+                                            onClick={isLastMessage ? onClose : () => setCurrentIndex(prev => prev + 1)}
+                                            className="message-button next with-previous"
+                                        >
+                                            {isLastMessage ? 'Continue' : 'Next'}
+                                        </button>
+                                    </>
+                                ) : (
+                                    <button
+                                        onClick={isLastMessage ? onClose : () => setCurrentIndex(prev => prev + 1)}
+                                        className="message-button next"
+                                    >
+                                        {isLastMessage ? 'Continue' : 'Next'}
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
