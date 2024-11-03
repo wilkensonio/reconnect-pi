@@ -15,81 +15,279 @@ import './styles/App.css';
 const MESSAGE_TIME_PREFIX = 'pi_message_time_';
 
 const ServerDisconnected = () => (
-    <div className="fixed inset-0" 
-         style={{ 
-           zIndex: 9999,
-           position: 'fixed',
-           top: 0,
-           left: 0,
-           right: 0,
-           bottom: 0,
-           backgroundColor: '#0051ca',
-           pointerEvents: 'all',
-           width: '1024px',
-           height: '600px',
-           display: 'flex',
-           alignItems: 'center',
-           justifyContent: 'space-between',
-           padding: '0 60px'
-         }}>
-        {/* Left Side - Logo */}
-        <div style={{ 
-            flex: '0 0 auto',
-        }}>
-            <img 
-                src="/CSC logo.png" 
-                alt="CSC Logo" 
-                style={{ 
-                    width: '600px',
-                    height: 'auto',
-                    filter: 'brightness(1.2)',
-                    opacity: '0.95'
-                }}
-            />
-        </div>
-        
-        {/* Right Side - Messages */}
-        <div style={{ 
-            flex: '0 0 auto',
+    <div className="fixed inset-0"
+         style={{
+            zIndex: 9999,
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: '#000612',
+            backgroundImage: 'linear-gradient(135deg, #000612 0%, #001336 100%)',
+            pointerEvents: 'all',
+            width: '1024px',
+            height: '600px',
             display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'flex-start'
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0 60px',
+            overflow: 'hidden',
+            perspective: '1000px'
+         }}>
+        {/* Animated Background Elements */}
+        <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            overflow: 'hidden',
+            zIndex: 0
         }}>
-            <h2 style={{ 
-                color: '#ffffff',
-                fontSize: '32px',
-                fontWeight: '500',
-                marginBottom: '16px',
-                fontFamily: 'Roboto, sans-serif',
-                letterSpacing: '0.5px',
-                textAlign: 'left'
+            {/* Digital Circuit Lines */}
+            <div style={{
+                position: 'absolute',
+                width: '150%',
+                height: '150%',
+                top: '-25%',
+                left: '-25%',
+                background: 'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath stroke=\'%23003cff\' stroke-width=\'0.5\' fill=\'none\' d=\'M10 10h80v80h-80z\'/%3E%3C/svg%3E")',
+                opacity: 0.1,
+                animation: 'circuitFlow 20s linear infinite',
+                transform: 'rotate(45deg)'
+            }}/>
+            
+            {/* Glowing Particles */}
+            {Array.from({ length: 50 }).map((_, i) => (
+                <div key={i} style={{
+                    position: 'absolute',
+                    width: '2px',
+                    height: '2px',
+                    background: '#00f7ff',
+                    borderRadius: '50%',
+                    boxShadow: '0 0 10px #00f7ff, 0 0 20px #00f7ff, 0 0 30px #00f7ff',
+                    top: `${Math.random() * 100}%`,
+                    left: `${Math.random() * 100}%`,
+                    animation: `particle ${5 + Math.random() * 10}s linear infinite`
+                }}/>
+            ))}
+            
+            {/* Holographic Grid */}
+            <div style={{
+                position: 'absolute',
+                width: '200%',
+                height: '200%',
+                top: '-50%',
+                left: '-50%',
+                background: 'linear-gradient(90deg, rgba(0,60,255,0.1) 1px, transparent 1px), linear-gradient(0deg, rgba(0,60,255,0.1) 1px, transparent 1px)',
+                backgroundSize: '20px 20px',
+                transform: 'perspective(500px) rotateX(60deg)',
+                animation: 'gridMove 10s linear infinite'
+            }}/>
+        </div>
+
+        {/* Left Side - Holographic Logo Display */}
+        <div style={{
+            flex: '0 0 400px',
+            height: '400px',
+            position: 'relative',
+            transformStyle: 'preserve-3d',
+            animation: 'holoRotate 15s ease-in-out infinite'
+        }}>
+            {/* Holographic Container */}
+            <div style={{
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+                background: 'rgba(0, 60, 255, 0.1)',
+                backdropFilter: 'blur(10px)',
+                borderRadius: '20px',
+                border: '2px solid rgba(0, 247, 255, 0.3)',
+                boxShadow: '0 0 30px rgba(0, 247, 255, 0.2)',
+                animation: 'holoPulse 2s ease-in-out infinite'
             }}>
-                Connection Lost
-            </h2>
-            <p style={{ 
-                color: '#ffffff',
-                fontSize: '18px',
-                marginBottom: '20px',
-                opacity: '0.9',
-                fontFamily: 'Roboto, sans-serif',
-                textAlign: 'left'
-            }}>
-                Unable to reach the server
-            </p>
-            <div style={{ 
-                color: '#ffffff',
-                fontSize: '16px',
-                opacity: '0.8',
-                animation: 'pulse 2s infinite',
-                fontFamily: 'Roboto, sans-serif',
-                textAlign: 'left'
-            }}>
-                Attempting to reconnect...
+                {/* Scanning Effect */}
+                <div style={{
+                    position: 'absolute',
+                    width: '100%',
+                    height: '2px',
+                    background: 'linear-gradient(90deg, transparent, #00f7ff, transparent)',
+                    animation: 'scan 2s ease-in-out infinite'
+                }}/>
+                
+                {/* Logo */}
+                <img
+                    src="/CSC logo.png"
+                    alt="CSC Logo"
+                    style={{
+                        position: 'absolute',
+                        width: '80%',
+                        height: 'auto',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        filter: 'brightness(2) drop-shadow(0 0 10px rgba(0, 247, 255, 0.5))',
+                        animation: 'logoFloat 4s ease-in-out infinite'
+                    }}
+                />
+                
+                {/* Holographic Glitch Effects */}
+                {Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} style={{
+                        position: 'absolute',
+                        width: '100%',
+                        height: '100%',
+                        background: 'rgba(0, 247, 255, 0.1)',
+                        animation: `glitch ${0.2 + i * 0.1}s ease-in-out infinite alternate-reverse`,
+                        clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+                        opacity: 0.5
+                    }}/>
+                ))}
             </div>
         </div>
+        
+        {/* Right Side - Futuristic Message Display */}
+        <div style={{
+            flex: '0 0 400px',
+            height: '400px',
+            background: 'rgba(0, 12, 36, 0.7)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: '20px',
+            border: '2px solid rgba(0, 247, 255, 0.3)',
+            boxShadow: '0 0 30px rgba(0, 247, 255, 0.1)',
+            overflow: 'hidden',
+            position: 'relative'
+        }}>
+            {/* Message Content */}
+            <div style={{
+                padding: '40px',
+                position: 'relative',
+                zIndex: 2
+            }}>
+                <h2 style={{
+                    color: '#00f7ff',
+                    fontSize: '36px',
+                    fontWeight: '600',
+                    marginBottom: '20px',
+                    fontFamily: 'Roboto, sans-serif',
+                    textShadow: '0 0 10px rgba(0, 247, 255, 0.5)',
+                    animation: 'textGlow 2s ease-in-out infinite'
+                }}>
+                    Connection Lost
+                </h2>
+                <p style={{
+                    color: '#ffffff',
+                    fontSize: '20px',
+                    marginBottom: '24px',
+                    fontFamily: 'Roboto, sans-serif',
+                    textShadow: '0 0 5px rgba(0, 247, 255, 0.3)'
+                }}>
+                    Unable to reach the server
+                </p>
+                <div style={{
+                    color: '#00f7ff',
+                    fontSize: '18px',
+                    animation: 'pulse 2s infinite',
+                    fontFamily: 'Roboto, sans-serif',
+                    textShadow: '0 0 5px rgba(0, 247, 255, 0.3)'
+                }}>
+                    Attempting to reconnect...
+                </div>
+            </div>
+            
+            {/* Diagnostic Data Animation */}
+            <div style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: '60px',
+                background: 'linear-gradient(0deg, rgba(0,247,255,0.1) 0%, transparent 100%)',
+                borderTop: '1px solid rgba(0, 247, 255, 0.3)',
+                padding: '10px',
+                fontFamily: 'monospace',
+                color: '#00f7ff',
+                fontSize: '12px',
+                animation: 'diagnostics 10s linear infinite'
+            }}>
+                {Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} style={{
+                        opacity: 0.7,
+                        animation: `typewriter ${1 + i * 0.5}s steps(40) infinite`
+                    }}>
+                        {`> Attempting to establish connection... Retry ${i + 1}`}
+                    </div>
+                ))}
+            </div>
+        </div>
+        
         <style>
             {`
+                @keyframes circuitFlow {
+                    0% { transform: rotate(45deg) translate(0, 0); }
+                    100% { transform: rotate(45deg) translate(-100px, -100px); }
+                }
+                
+                @keyframes particle {
+                    0% { transform: translate(0, 0); opacity: 0; }
+                    50% { opacity: 1; }
+                    100% { transform: translate(100px, -100px); opacity: 0; }
+                }
+                
+                @keyframes gridMove {
+                    0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+                    100% { transform: perspective(500px) rotateX(60deg) translateY(20px); }
+                }
+                
+                @keyframes holoRotate {
+                    0% { transform: rotateY(0deg); }
+                    50% { transform: rotateY(15deg); }
+                    100% { transform: rotateY(0deg); }
+                }
+                
+                @keyframes holoPulse {
+                    0% { box-shadow: 0 0 30px rgba(0, 247, 255, 0.2); }
+                    50% { box-shadow: 0 0 50px rgba(0, 247, 255, 0.4); }
+                    100% { box-shadow: 0 0 30px rgba(0, 247, 255, 0.2); }
+                }
+                
+                @keyframes scan {
+                    0% { top: 0; }
+                    100% { top: 100%; }
+                }
+                
+                @keyframes logoFloat {
+                    0% { transform: translate(-50%, -50%) scale(1); }
+                    50% { transform: translate(-50%, -50%) scale(1.1); }
+                    100% { transform: translate(-50%, -50%) scale(1); }
+                }
+                
+                @keyframes glitch {
+                    0% { transform: translate(0); }
+                    20% { transform: translate(-2px, 2px); }
+                    40% { transform: translate(-2px, -2px); }
+                    60% { transform: translate(2px, 2px); }
+                    80% { transform: translate(2px, -2px); }
+                    100% { transform: translate(0); }
+                }
+                
+                @keyframes textGlow {
+                    0% { text-shadow: 0 0 10px rgba(0, 247, 255, 0.5); }
+                    50% { text-shadow: 0 0 20px rgba(0, 247, 255, 0.8), 0 0 30px rgba(0, 247, 255, 0.5); }
+                    100% { text-shadow: 0 0 10px rgba(0, 247, 255, 0.5); }
+                }
+                
+                @keyframes diagnostics {
+                    0% { transform: translateY(0); }
+                    100% { transform: translateY(-100%); }
+                }
+                
+                @keyframes typewriter {
+                    from { width: 0; }
+                    to { width: 100%; }
+                }
+                
                 @keyframes pulse {
                     0% { opacity: 0.6; }
                     50% { opacity: 1; }

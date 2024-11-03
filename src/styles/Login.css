@@ -55,6 +55,7 @@
   height: auto;
   z-index: 1;
   position: relative;
+  filter: brightness(2);
 }
 
 .login-section {
