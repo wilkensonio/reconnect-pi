@@ -7,7 +7,6 @@ import { apiService } from '../services/api';
 import { useAppContext } from '../context/AppContext';
 import '../styles/Schedule.css';
 import logoSrc from '/rcnnct.png';
-import LogoutButton from './LogoutButton';
 
 const predefinedMessages = [
   "Discuss project updates",
@@ -38,6 +37,9 @@ const Schedule = () => {
   const [studentAppointments, setStudentAppointments] = useState([]);
   const [meetingDurations, setMeetingDurations] = useState([]);
   const [blockedTimeSlots, setBlockedTimeSlots] = useState([]);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isDateSelected, setIsDateSelected] = useState(false);
+  const [isTimeSelected, setIsTimeSelected] = useState(false);
 
   const reasonDropdownRef = useRef(null);
   const durationDropdownRef = useRef(null);
@@ -62,12 +64,10 @@ const Schedule = () => {
         const facultyAppointments = await apiService.getAppointmentsByUser(facultyId);
         setAppointments(facultyAppointments);
 
-        // Get student appointments
         if (user?.student_id) {
           const studentExistingAppointments = await apiService.getAppointmentsByUser(user.student_id);
           setStudentAppointments(studentExistingAppointments);
 
-          // Combine all blocked time slots
           const allBlockedSlots = [...facultyAppointments, ...studentExistingAppointments].map(apt => ({
             date: apt.date,
             start: apt.start_time,
@@ -98,6 +98,21 @@ const Schedule = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isReasonDropdownVisible, isDurationDropdownVisible]);
 
+  useEffect(() => {
+    // Update step based on selections
+    if (!isDateSelected) {
+      setCurrentStep(1); // Select date
+    } else if (!isTimeSelected) {
+      setCurrentStep(2); // Select time
+    } else if (!reason) {
+      setCurrentStep(3); // Select reason
+    } else if (!selectedDuration) {
+      setCurrentStep(4); // Select duration
+    } else {
+      setCurrentStep(5); // Ready to schedule
+    }
+  }, [isDateSelected, isTimeSelected, reason, selectedDuration]);
+
   const isTimeSlotBlocked = (dateTime, duration) => {
     const startTime = new Date(dateTime);
     const endTime = new Date(startTime);
@@ -119,22 +134,36 @@ const Schedule = () => {
       blockEnd.setHours(blockEndHours, blockEndMinutes, 0, 0);
 
       return (
-        (startTime < blockEnd && endTime > blockStart) || // Check if times overlap
-        (startTime >= blockStart && startTime < blockEnd) || // Check if start time is within blocked period
-        (endTime > blockStart && endTime <= blockEnd) // Check if end time is within blocked period
+        (startTime < blockEnd && endTime > blockStart) ||
+        (startTime >= blockStart && startTime < blockEnd) ||
+        (endTime > blockStart && endTime <= blockEnd)
       );
     });
   };
 
   const handleDateTimeSelect = ({ date }) => {
-    setSelectedDate(date);
-    setSelectedTime(date.toTimeString().slice(0,5));
-    setSelectedDuration('');
-    setDurationValue(null);
-    computePossibleDurations(date);
+    if (!isDateSelected) {
+      // First selection - capture date only
+      setSelectedDate(date);
+      setIsDateSelected(true);
+      // Reset any previously selected time/reason/duration
+      setSelectedTime(null);
+      setIsTimeSelected(false);
+      setReason('');
+      setSelectedDuration('');
+      setDurationValue(null);
+    } else if (!isTimeSelected) {
+      // Second selection - capture time
+      setSelectedDate(date);
+      setSelectedTime(date.toTimeString().slice(0,5));
+      setIsTimeSelected(true);
+      computePossibleDurations(date);
+    }
   };
 
   const computePossibleDurations = (selectedDateTime) => {
+    if (!selectedDateTime) return;
+
     const dayOfWeek = selectedDateTime.toLocaleString('en-US', { weekday: 'long' });
     const dayAvailability = availableTimes.find(slot => slot.day === dayOfWeek);
     if (!dayAvailability) return;
@@ -152,11 +181,9 @@ const Schedule = () => {
     const [selectedHours, selectedMinutes] = selectedDateTime.toTimeString().slice(0,5).split(':').map(Number);
     selectedTime.setHours(selectedHours, selectedMinutes, 0, 0);
 
-    // Calculate the maximum possible duration
     const maxDurationMs = availabilityEnd - selectedTime;
     const maxDurationMinutes = Math.floor(maxDurationMs / 60000);
 
-    // Define possible durations and filter out blocked ones
     const durations = [15, 30, 45, 60];
     const possibleDurations = durations
       .filter(duration => duration <= maxDurationMinutes)
@@ -169,7 +196,7 @@ const Schedule = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedDate || !selectedTime || !reason || !durationValue) {
-      setError('Please select a date/time, meeting duration, and provide a reason for the meeting.');
+      setError('Please complete all required fields.');
       return;
     }
 
@@ -193,7 +220,6 @@ const Schedule = () => {
         faculty_id: facultyId
       };
 
-      console.log('Submitting appointment:', appointmentData);
       await apiService.createAppointment(appointmentData);
       navigate('/view');
     } catch (error) {
@@ -215,6 +241,23 @@ const Schedule = () => {
     setIsDurationDropdownVisible(false);
   };
 
+  const getStepPrompt = () => {
+    switch (currentStep) {
+      case 1:
+        return "Select a Date";
+      case 2:
+        return "Select a Time";
+      case 3:
+        return "Select Meeting Reason";
+      case 4:
+        return "Select Meeting Duration";
+      case 5:
+        return "Review and Schedule";
+      default:
+        return "Select a Date";
+    }
+  };
+
   return (
     <div className="schedule">
       <BackgroundLogos logoSrc={logoSrc} />
@@ -224,7 +267,7 @@ const Schedule = () => {
         </div>
         <div className="content-cards">
           <div className="left-card">
-            <h2>Select Date and Time</h2>
+            <h2>{getStepPrompt()}</h2>
             <div className="calendar-wrapper">
               <Calendar
                 selectedDate={selectedDate}
@@ -239,34 +282,36 @@ const Schedule = () => {
           <div className="right-card">
             <h2>Meeting Details</h2>
             <form onSubmit={handleSubmit}>
-              <div className="input-group">
-                <label>Reason for Meeting:</label>
-                <div className="input-dropdown-container" ref={reasonDropdownRef}>
-                  <input
-                    value={reason}
-                    onChange={(e) => setReason(e.target.value)}
-                    onClick={() => setIsReasonDropdownVisible(!isReasonDropdownVisible)}
-                    placeholder="Click to select a reason"
-                    required
-                    className="input-field"
-                  />
-                  {isReasonDropdownVisible && (
-                    <div className="dropdown-menu">
-                      {predefinedMessages.map((message, index) => (
-                        <div
-                          key={index}
-                          className="dropdown-item"
-                          onClick={() => handlePredefinedMessageClick(message)}
-                        >
-                          {message}
-                        </div>
-                      ))}
-                    </div>
-                  )}
+              {currentStep >= 3 && (
+                <div className="input-group">
+                  <label>Reason for Meeting:</label>
+                  <div className="input-dropdown-container" ref={reasonDropdownRef}>
+                    <input
+                      value={reason}
+                      onChange={(e) => setReason(e.target.value)}
+                      onClick={() => setIsReasonDropdownVisible(!isReasonDropdownVisible)}
+                      placeholder="Click to select a reason"
+                      required
+                      className="input-field"
+                    />
+                    {isReasonDropdownVisible && (
+                      <div className="dropdown-menu">
+                        {predefinedMessages.map((message, index) => (
+                          <div
+                            key={index}
+                            className="dropdown-item"
+                            onClick={() => handlePredefinedMessageClick(message)}
+                          >
+                            {message}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {selectedDate && selectedTime && meetingDurations.length > 0 && (
+              {currentStep >= 4 && reason && (
                 <div className="input-group">
                   <label>Meeting Duration:</label>
                   <div className="input-dropdown-container" ref={durationDropdownRef}>
@@ -295,25 +340,13 @@ const Schedule = () => {
                 </div>
               )}
 
-              {selectedDate && selectedTime && meetingDurations.length === 0 && (
-                <div className="input-group">
-                  <label>Meeting Duration:</label>
-                  <input
-                    value="No available durations"
-                    readOnly
-                    className="input-field"
-                    disabled
-                  />
-                </div>
-              )}
-
               {error && <div className="error-message">{error}</div>}
 
               <div className="button-group">
                 <Button
                   type="submit"
-                  className="full-width-button"
-                  disabled={loading || !selectedDate || !selectedTime || !selectedDuration}
+                  className={`full-width-button ${currentStep < 5 ? 'button-disabled' : ''}`}
+                  disabled={currentStep < 5 || loading}
                 >
                   {loading ? 'Scheduling...' : 'Schedule Meeting'}
                 </Button>

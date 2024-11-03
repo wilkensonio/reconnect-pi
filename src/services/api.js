@@ -86,9 +86,13 @@ export const apiService = {
   async getAppointmentsByUser(userId) {
     try {
       const response = await api.get(`/appointments/get-by-user/${userId}`);
-      return response.data;
+      console.log('API Response for appointments:', response.data);
+      return Array.isArray(response.data) ? response.data : [];
     } catch (error) {
-      console.error('Error fetching appointments:', error);
+      console.error('Error in getAppointmentsByUser:', error.response || error);
+      if (error.response?.status === 404) {
+        return [];
+      }
       throw error;
     }
   },

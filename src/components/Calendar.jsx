@@ -190,6 +190,13 @@ const Calendar = ({ selectedDate, onSelectDate, facultyId }) => {
     return false;
   };
 
+  const isTimeSelected = (timeSlot) => {
+    const hours = timeSlot.getHours().toString().padStart(2, '0');
+    const minutes = timeSlot.getMinutes().toString().padStart(2, '0');
+    const timeString = `${hours}:${minutes}`;
+    return timeString === selectedTime;
+  };
+
   return (
     <div className="calendar-wrapper">
       <DatePicker
