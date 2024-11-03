@@ -191,6 +191,34 @@ const Schedule = () => {
     setMeetingDurations(possibleDurations);
   };
 
+  const handleUpdateDate = (newDate) => {
+    setSelectedDate(newDate);
+    setIsDateSelected(true);
+    setSelectedTime(null);
+    setIsTimeSelected(false);
+    setSelectedDuration('');
+    setDurationValue(null);
+    computePossibleDurations(newDate);
+  };
+
+  const handleUpdateTime = (newTime) => {
+    setSelectedTime(newTime);
+    setIsTimeSelected(true);
+    const timeDate = new Date(selectedDate);
+    const [hours, minutes] = newTime.split(':').map(Number);
+    timeDate.setHours(hours, minutes);
+    computePossibleDurations(timeDate);
+  };
+
+  const handleUpdateDuration = (duration) => {
+    setSelectedDuration(duration.label);
+    setDurationValue(duration.value);
+  };
+
+  const handleUpdateReason = (newReason) => {
+    setReason(newReason);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!selectedDate || !selectedTime || !reason || !durationValue) {
@@ -375,6 +403,14 @@ const Schedule = () => {
               duration={selectedDuration}
               onConfirm={handleConfirmSchedule}
               isLoading={loading}
+              meetingDurations={meetingDurations}
+              availableTimes={availableTimes}
+              blockedTimeSlots={blockedTimeSlots}
+              facultyId={facultyId}
+              onUpdateDate={handleUpdateDate}
+              onUpdateTime={handleUpdateTime}
+              onUpdateReason={handleUpdateReason}
+              onUpdateDuration={handleUpdateDuration}
             />
           </div>
         )}

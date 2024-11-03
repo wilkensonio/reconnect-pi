@@ -3,13 +3,13 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     background: rgba(0, 0, 0, 0.6);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 100;
+    z-index: 1000;
     animation: modalFadeIn 0.3s ease-out;
   }
   
@@ -25,126 +25,138 @@
   }
   
   .review-modal-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    padding: 2rem;
-    background-color: transparent;
+    width: 550px;
     position: relative;
-    z-index: 101;
+    z-index: 1001;
   }
   
   .review-modal-card {
     background: linear-gradient(135deg, #3498db, #8e44ad);
-    padding: 1rem;
+    padding: 1.5rem;
     border-radius: 12px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
     animation: modalZoomIn 0.3s ease-out;
-    width: 600px;
-    height: 500px;
     opacity: 0.95;
   }
   
   .review-modal-content {
     display: flex;
     flex-direction: column;
-    height: 90%;
+    gap: 1rem;
   }
   
   .review-modal-content h2 {
     color: #ffffff;
     text-align: center;
-    font-size: 2rem;
-    margin-bottom: 0.75rem;
-    flex: 0 0 auto;
+    font-size: 1.5rem;
+    margin: 0;
   }
   
-  .review-modal-text-container {
+  .review-modal-details {
     background-color: rgba(255, 255, 255, 0.15);
     border-radius: 8px;
     padding: 1rem;
-    flex: 1 1 auto;
-    height: 300px;
-  }
-  
-  .review-modal-text {
-    color: white;
-    font-size: 1rem;
-    line-height: 1.4;
-    height: 100%;
   }
   
   .review-modal-info {
-    margin-bottom: 0.75rem;
+    margin-bottom: 1rem;
     padding-bottom: 0.75rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.3);
   }
   
   .review-modal-from {
-    font-size: 1rem;
     color: white;
-    font-weight: 500;
+    font-size: 1rem;
+    margin: 0;
   }
   
-  .review-modal-footer {
-    text-align: center;
-    margin-top: 0.75rem;
-    flex: 0 0 auto;
-    height: 40px;
+  .review-modal-field {
+    margin-bottom: 0.75rem;
+  }
+  
+  .review-modal-field strong {
+    display: block;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 0.25rem;
+  }
+  
+  .review-modal-value {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 0.75rem;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    color: white;
+  }
+  
+  .review-modal-value:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .edit-icon {
+    opacity: 0.6;
   }
   
   .review-modal-buttons {
     display: flex;
     justify-content: center;
-    align-items: center;
-    gap: 0.75rem;
-    height: 200%;
+    gap: 1rem;
+    margin-top: 1rem;
   }
   
   .review-modal-button {
-    position: relative;
-    font-size: 1.3rem;
-    height: 36px;
+    padding: 0.75rem 1.5rem;
     border: none;
     border-radius: 8px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    font-size: 1rem;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-    padding: 0 1.25rem;
-  }
-  
-  .review-modal-button.next {
-    width: 120px;
-    height: 60px;
-    background-color: #ffffff;
-    color: #3498db;
+    transition: all 0.2s;
   }
   
   .review-modal-button.previous {
-    width: 120px;
-    height: 60px;
     background-color: #e74c3c;
+    color: white;
+    min-width: 100px;
+  }
+  
+  .review-modal-button.next {
+    background-color: white;
+    color: #3498db;
+    min-width: 120px;
+  }
+  
+  /* Edit Popup Styles */
+  .edit-popup-content {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 1rem;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  
+  .edit-option {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    color: white;
+    transition: background-color 0.2s;
+  }
+  
+  .edit-option:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .calendar-dates-only {
     color: white;
   }
   
-  .review-modal-button:hover {
-    transform: translateY(-2px);
-  }
-  
-  .review-modal-button:active {
-    transform: scale(0.95);
-  }
-  
-  .review-modal-button:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-    transform: none;
+  .calendar-dates-only :global(.calendar) {
+    background: transparent;
   }
   
   /* Animation keyframes */
@@ -154,23 +166,35 @@
   }
   
   @keyframes modalZoomIn {
-    from { transform: scale(0.5); }
+    from { transform: scale(0.95); }
     to { transform: scale(1); }
   }
-  
-  /* Additional styles for detail sections */
-  .review-modal-text div {
-    margin-bottom: 0.75rem;
+
+  .review-modal-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #e0e0e0;
+    color: #666;
+    border: 1px solid #ccc;
+  }
+
+  /* Add specific styles for week navigation buttons */
+.week-navigation .review-modal-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    min-width: 80px;
   }
   
-  .review-modal-text strong {
-    display: block;
-    margin-bottom: 0.25rem;
-    color: rgba(255, 255, 255, 0.9);
+  .week-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
   }
   
-  .review-modal-text p {
-    margin: 0;
-    padding-left: 0.75rem;
-    color: rgba(255, 255, 255, 0.8);
+  .week-label {
+    font-size: 1rem;
+    color: #fcf9f9;
+    text-align: center;
   }
