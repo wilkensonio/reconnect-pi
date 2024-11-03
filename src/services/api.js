@@ -3,6 +3,7 @@ import axios from 'axios';
 const API_URL = import.meta.env.VITE_API_URL || 'http://ec2-3-82-206-23.compute-1.amazonaws.com:8000/api/v1';
 const apiKey = import.meta.env.VITE_API_KEY;
 
+// Single axios instance
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -10,8 +11,10 @@ const api = axios.create({
     'Accept': 'application/json',
     'R-API-KEY': apiKey,
   },
+  timeout: 5000,
 });
 
+// Add auth interceptor
 api.interceptors.request.use(request => {
   const token = localStorage.getItem('reconnect_access_token');
   if (token) {
@@ -20,6 +23,7 @@ api.interceptors.request.use(request => {
   return request;
 });
 
+// Add response interceptor
 api.interceptors.response.use(
   response => response,
   error => {
