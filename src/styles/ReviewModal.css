@@ -1,0 +1,176 @@
+/* Review Modal Styles */
+.review-modal-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    animation: modalFadeIn 0.3s ease-out;
+  }
+  
+  .review-modal-page::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  
+  .review-modal-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 2rem;
+    background-color: transparent;
+    position: relative;
+    z-index: 101;
+  }
+  
+  .review-modal-card {
+    background: linear-gradient(135deg, #3498db, #8e44ad);
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    animation: modalZoomIn 0.3s ease-out;
+    width: 600px;
+    height: 500px;
+    opacity: 0.95;
+  }
+  
+  .review-modal-content {
+    display: flex;
+    flex-direction: column;
+    height: 90%;
+  }
+  
+  .review-modal-content h2 {
+    color: #ffffff;
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+    flex: 0 0 auto;
+  }
+  
+  .review-modal-text-container {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 1rem;
+    flex: 1 1 auto;
+    height: 300px;
+  }
+  
+  .review-modal-text {
+    color: white;
+    font-size: 1rem;
+    line-height: 1.4;
+    height: 100%;
+  }
+  
+  .review-modal-info {
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  
+  .review-modal-from {
+    font-size: 1rem;
+    color: white;
+    font-weight: 500;
+  }
+  
+  .review-modal-footer {
+    text-align: center;
+    margin-top: 0.75rem;
+    flex: 0 0 auto;
+    height: 40px;
+  }
+  
+  .review-modal-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    height: 200%;
+  }
+  
+  .review-modal-button {
+    position: relative;
+    font-size: 1.3rem;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    padding: 0 1.25rem;
+  }
+  
+  .review-modal-button.next {
+    width: 120px;
+    height: 60px;
+    background-color: #ffffff;
+    color: #3498db;
+  }
+  
+  .review-modal-button.previous {
+    width: 120px;
+    height: 60px;
+    background-color: #e74c3c;
+    color: white;
+  }
+  
+  .review-modal-button:hover {
+    transform: translateY(-2px);
+  }
+  
+  .review-modal-button:active {
+    transform: scale(0.95);
+  }
+  
+  .review-modal-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  /* Animation keyframes */
+  @keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes modalZoomIn {
+    from { transform: scale(0.5); }
+    to { transform: scale(1); }
+  }
+  
+  /* Additional styles for detail sections */
+  .review-modal-text div {
+    margin-bottom: 0.75rem;
+  }
+  
+  .review-modal-text strong {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .review-modal-text p {
+    margin: 0;
+    padding-left: 0.75rem;
+    color: rgba(255, 255, 255, 0.8);
+  }

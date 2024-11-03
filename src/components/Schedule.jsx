@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import Calendar from './Calendar';
 import BackgroundLogos from './BackgroundLogos';
 import Button from './Button';
+import ReviewModal from './ReviewModal';
 import { apiService } from '../services/api';
 import { useAppContext } from '../context/AppContext';
 import '../styles/Schedule.css';
+import '../styles/ReviewModal.css';
 import logoSrc from '/rcnnct.png';
 
 const predefinedMessages = [
@@ -40,6 +42,7 @@ const Schedule = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isDateSelected, setIsDateSelected] = useState(false);
   const [isTimeSelected, setIsTimeSelected] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
   const reasonDropdownRef = useRef(null);
   const durationDropdownRef = useRef(null);
@@ -99,17 +102,16 @@ const Schedule = () => {
   }, [isReasonDropdownVisible, isDurationDropdownVisible]);
 
   useEffect(() => {
-    // Update step based on selections
     if (!isDateSelected) {
-      setCurrentStep(1); // Select date
+      setCurrentStep(1);
     } else if (!isTimeSelected) {
-      setCurrentStep(2); // Select time
+      setCurrentStep(2);
     } else if (!reason) {
-      setCurrentStep(3); // Select reason
+      setCurrentStep(3);
     } else if (!selectedDuration) {
-      setCurrentStep(4); // Select duration
+      setCurrentStep(4);
     } else {
-      setCurrentStep(5); // Ready to schedule
+      setCurrentStep(5);
     }
   }, [isDateSelected, isTimeSelected, reason, selectedDuration]);
 
@@ -119,7 +121,6 @@ const Schedule = () => {
     endTime.setMinutes(endTime.getMinutes() + duration);
 
     const dateStr = startTime.toISOString().split('T')[0];
-    const timeStr = startTime.toTimeString().slice(0, 5);
 
     return blockedTimeSlots.some(blocked => {
       if (blocked.date !== dateStr) return false;
@@ -143,17 +144,14 @@ const Schedule = () => {
 
   const handleDateTimeSelect = ({ date }) => {
     if (!isDateSelected) {
-      // First selection - capture date only
       setSelectedDate(date);
       setIsDateSelected(true);
-      // Reset any previously selected time/reason/duration
       setSelectedTime(null);
       setIsTimeSelected(false);
       setReason('');
       setSelectedDuration('');
       setDurationValue(null);
     } else if (!isTimeSelected) {
-      // Second selection - capture time
       setSelectedDate(date);
       setSelectedTime(date.toTimeString().slice(0,5));
       setIsTimeSelected(true);
@@ -193,13 +191,16 @@ const Schedule = () => {
     setMeetingDurations(possibleDurations);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!selectedDate || !selectedTime || !reason || !durationValue) {
       setError('Please complete all required fields.');
       return;
     }
+    setIsReviewModalOpen(true);
+  };
 
+  const handleConfirmSchedule = async () => {
     setLoading(true);
     setError('');
 
@@ -225,6 +226,7 @@ const Schedule = () => {
     } catch (error) {
       console.error('Error scheduling meeting:', error);
       setError(error.response?.data?.detail || 'Failed to schedule meeting. Please try again.');
+      setIsReviewModalOpen(false);
     } finally {
       setLoading(false);
     }
@@ -261,7 +263,7 @@ const Schedule = () => {
   return (
     <div className="schedule">
       <BackgroundLogos logoSrc={logoSrc} />
-      <div className="schedule-container">
+      <div className="schedule-container" style={{ position: 'relative' }}>
         <div className="top-card">
           Schedule Meeting with: Prof. {facultyInfo?.last_name}
         </div>
@@ -361,6 +363,21 @@ const Schedule = () => {
             </form>
           </div>
         </div>
+
+        {isReviewModalOpen && (
+          <div className="review-modal-page">
+            <ReviewModal
+              onClose={() => setIsReviewModalOpen(false)}
+              facultyName={facultyInfo?.last_name}
+              selectedDate={selectedDate}
+              selectedTime={selectedTime}
+              reason={reason}
+              duration={selectedDuration}
+              onConfirm={handleConfirmSchedule}
+              isLoading={loading}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
