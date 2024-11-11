@@ -1,85 +1,80 @@
-import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
-import FacultySelection from '../components/FacultySelection';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import BackgroundLogos from './BackgroundLogos';
+import Button from './Button';
 import { apiService } from '../services/api';
-import { useAppContext } from '../context/AppContext';
+import LogoutButton from './LogoutButton';
+import '../styles/Home.css';
+import logoSrc from '/rcnnct.png';
 
-// Mock services and dependencies
-jest.mock('../services/api');
-jest.mock('../context/AppContext', () => ({
-  useAppContext: jest.fn(),
-}));
+const Home = () => {
+  const navigate = useNavigate();
+  const [facultyInfo, setFacultyInfo] = useState(null);
+  const facultyId = sessionStorage.getItem('selected_faculty_id');
 
-// Mock assets and components
-jest.mock('/rcnnct.png', () => 'mockLogoSrc');
-jest.mock('../components/BackgroundLogos', () => () => <div data-testid="background-logos" />);
-jest.mock('../components/Button', () => (props) => <button {...props} data-testid="button-mock">Mock Button</button>);
-jest.mock('../styles/FacultySelection.css', () => {});
+  useEffect(() => {
+    const fetchFacultyInfo = async () => {
+      if (!facultyId) {
+        navigate('/', { replace: true });
+        return;
+      }
 
-describe('FacultySelection Component', () => {
-  beforeEach(() => {
-    // Mock the user context
-    useAppContext.mockReturnValue({ user: { name: 'Test User' } });
+      try {
+        const info = await apiService.getFacultyInfo(facultyId);
+        setFacultyInfo(info);
+      } catch (error) {
+        console.error('Error fetching faculty info:', error);
+      }
+    };
 
-    // Mock the apiService response
-    apiService.getAllFaculty.mockResolvedValue([
-      {
-        id: "70578617",
-        user_id: "70578617",
-        first_name: "J",
-        last_name: "Escobar",
-        title: "Professor",
-        department: "Computer Science",
-      },
-    ]);
-  });
+    fetchFacultyInfo();
+  }, [facultyId, navigate]);
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
 
-  test('renders FacultySelection with logoSrc image', async () => {
-    render(
-      <MemoryRouter>
-        <FacultySelection />
-      </MemoryRouter>
-    );
+  const handleChangeFaculty = () => {
+    sessionStorage.removeItem('selected_faculty_id');
+    navigate('/', { replace: true });
+  };
+  
 
-    // Check if logo image is rendered with mock src
-    const logoImage = screen.getByRole('img', { name: /background logo/i });
-    expect(logoImage).toBeInTheDocument();
-    expect(logoImage).toHaveAttribute('src', 'mockLogoSrc');
-  });
+  return (
+    <div className="home">
+      <BackgroundLogos logoSrc={logoSrc} />
+      <div className="home-container">
+        <div className="card home-card">
+          <div className="faculty-header">
+            {facultyInfo && (
+              <h2>Prof. {facultyInfo.last_name}'s Office</h2>
+            )}
+          </div>
+          <div className="button-container">
+            <Button 
+              onClick={() => handleNavigation('/schedule')}
+              className="action-button"
+            >
+              Schedule Meeting
+            </Button>
+            <Button 
+              onClick={() => handleNavigation('/view')}
+              className="action-button"
+            >
+              View Meetings
+            </Button>
+            <Button 
+              onClick={handleChangeFaculty}
+              className="change-faculty-button"
+            >
+              Change Faculty Member
+            </Button>
+            <LogoutButton className="logout-button" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
-  test('calls getAllFaculty API and allows faculty selection', async () => {
-    render(
-      <MemoryRouter>
-        <FacultySelection />
-      </MemoryRouter>
-    );
-
-    // Verify that the getAllFaculty API was called once
-    expect(apiService.getAllFaculty).toHaveBeenCalledTimes(1);
-
-    // Check that loading spinner appears initially
-    expect(screen.getByText('Loading faculty members...')).toBeInTheDocument();
-
-    // Wait for faculty data to load
-    await waitFor(() => expect(screen.getByText(/Escobar, J/i)).toBeInTheDocument());
-
-    // Verify faculty member's name appears
-    const facultyButton = screen.getByRole('button', { name: /Escobar, J/i });
-    expect(facultyButton).toBeInTheDocument();
-
-    // Simulate selecting a faculty member
-    fireEvent.click(facultyButton);
-
-    // Check if the faculty ID is stored in sessionStorage
-    expect(sessionStorage.getItem('selected_faculty_id')).toBe("70578617");
-
-    // Check that BackgroundLogos and Button are rendered
-    expect(screen.getByTestId('background-logos')).toBeInTheDocument();
-    expect(screen.getByTestId('button-mock')).toBeInTheDocument();
-  });
-});
+export default Home;
