@@ -1,244 +1,333 @@
+/* ViewMeetings.css */
+:root {
+  --primary-blue: rgb(45, 85, 255);
+  --secondary-blue: rgb(25, 65, 220);
+  --glass-bg: rgba(37, 99, 235, 0.4);
+  --card-bg: rgba(255, 255, 255, 0.25);
+  --success-green: #224ec5;
+  --success-hover: #16a34a;
+  --danger-red: #ef4444;
+  --danger-hover: #dc2626;
+  --background-blur: blur(12px);
+  --card-radius: 16px;
+  --button-radius: 8px;
+  --shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
 .view-meetings {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   width: 100vw;
-  position: relative;
+  background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
 }
 
 .meetings-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   width: 100%;
-  max-width: 1400px;
-  padding: 2rem;
-  margin: 2rem;
+  max-width: 1024px;
+  height: 100vh;
+  max-height: 600px;
+  padding: 1rem;
+  z-index: 1;
 }
 
 .meetings-card {
-  background-color: rgba(8, 35, 153, 0.849);
-  border-radius: 16px;
-  padding: 2.5rem;
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-  border: 3px solid var(--accent-color);
-  width: 100%;
-  max-width: 1000px;
-  height: 85vh;
-  position: relative;
+  background: var(--glass-bg);
+  backdrop-filter: var(--background-blur);
+  border-radius: var(--card-radius);
+  padding: 1.2rem;
+  box-shadow: var(--shadow);
+  height: 100%;
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
+  overflow: hidden;
 }
 
 .meetings-card h2 {
   color: white;
   text-align: center;
-  font-size: 2.5rem;
-  margin: 0 0 2rem 0;
-  text-shadow:
-    -1px -1px 0 navy,
-    1px -1px 0 navy,
-    -1px 1px 0 navy,
-    1px 1px 0 navy;
+  font-size: 2.25rem;
+  font-weight: 600;
+  margin: 0;
+  padding: 0;
 }
 
 .appointments-list-container {
   flex: 1;
-  overflow: hidden;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0.5rem;
   position: relative;
-  margin-bottom: 1rem;
 }
 
 .appointments-list {
-  height: 100%;
-  overflow-y: auto;
-  padding-right: 10px;
-}
-
-/* Scrollbar styling */
-.appointments-list::-webkit-scrollbar {
-  width: 8px;
-}
-
-.appointments-list::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-}
-
-.appointments-list::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-}
-
-.appointment-item {
-  background-color: rgba(59, 131, 246, 0.959);
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1rem;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100% !important;
+  height: 300px !important;
+}
+
+.appointment-item,
+.past-appointment {
+  background: var(--card-bg);
+  backdrop-filter: var(--background-blur);
+  border-radius: var(--button-radius);
+  padding: 0.8rem;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   border: 1px solid rgba(255, 255, 255, 0.2);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.appointment-item:last-child {
-  margin-bottom: 0;
-}
-
-.appointment-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.appointment-info {
-  flex: 1;
-  color: white;
+  width: 100% !important;
+  height: 100% !important;
+  box-sizing: border-box;
 }
 
 .appointment-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
 }
 
-.appointment-header h3 {
-  font-size: 1.4rem;
-  margin: 0;
-  text-shadow:
-    -1px -1px 0 navy,
-    1px -1px 0 navy,
-    -1px 1px 0 navy,
-    1px 1px 0 navy;
-}
-
-.appointment-date {
-  font-size: 1rem;
-  opacity: 0.9;
+.appointment-info {
+  flex: 1;
+  color: white;
+  margin-bottom: -4rem !important;
 }
 
 .appointment-time {
+  color: white;
   font-size: 1.1rem;
-  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.appointment-date {
+  color: white;
+  font-size: 1.1rem;
+  text-align: right;
 }
 
 .appointment-reason {
+  color: rgba(255, 255, 255, 0.9);
   font-size: 1rem;
-  opacity: 0.9;
+  margin-top: 0.25rem;
 }
 
-.button-container {
+/* Button Groups */
+.button-group-apt {
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 0rem !important;
+  height: 32px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Common button base styles */
+.button-group-apt button {
+  all: unset;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 85px !important;
+  height: 32px !important;
+  border-radius: var(--button-radius) !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Individual button styles */
+.check-in-button {
+  background-color: var(--success-green) !important;
+  color: white !important;
+}
+
+.check-in-button:disabled,
+.check-in-button[disabled],
+.check-in-button.disabled {
+  background-color: #cccccc !important;
+  color: #666666 !important;
+  cursor: not-allowed !important;
+  opacity: 0.6 !important;
+  pointer-events: none !important;
+}
+
+.reschedule-button {
+  background-color: var(--secondary-blue) !important;
+  color: white !important;
+}
+
+.cancel-button {
+  background-color: #dc2626 !important;
+  color: white !important;
+}
+
+/* Button hover states */
+.check-in-button:hover:not(:disabled) {
+  background-color: #b91c1c !important;
+  transform: translateY(-1px);
+}
+
+.reschedule-button:hover:not(:disabled) {
+  background-color: var(--primary-blue) !important;
+  transform: translateY(-1px);
+}
+
+.cancel-button:hover:not(:disabled) {
+  background-color: var(--danger-hover) !important;
+  transform: translateY(-1px);
+}
+
+/* Fixed button container */
+.fixed-button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   margin-top: auto;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0;
+  width: 100%;
 }
 
-.delete-button {
-  background-color: rgba(239, 68, 68, 0.8);
+.toggle-past-button {
+  background: var(--card-bg);
   color: white;
+  backdrop-filter: var(--background-blur);
+  width: 100%;
+  padding: 0.6rem;
+  border: none;
+  border-radius: var(--button-radius);
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  margin: 0 0 0rem 0;
+  order: -1;
+  position: relative;
+  z-index: 3;
 }
 
-.delete-button:hover {
-  background-color: rgba(239, 68, 68, 1);
-  transform: translateY(-2px);
+.toggle-past-button:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
-.delete-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
+.back-button,
+.logout-button {
+  width: 100%;
+  padding: 0.6rem;
+  border: none;
+  border-radius: var(--button-radius);
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  margin: 0;
 }
 
 .back-button {
-  width: 100%;
-  padding: 1rem;
-  background-color: rgba(100, 116, 139, 0.8);
+  background: var(--secondary-blue);
   color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-shadow:
-    -1px -1px 0 navy,
-    1px -1px 0 navy,
-    -1px 1px 0 navy,
-    1px 1px 0 navy;
 }
 
 .back-button:hover {
-  background-color: rgba(100, 116, 139, 1);
-  transform: translateY(-2px);
+  background: var(--primary-blue);
 }
 
-.button-group {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.check-in-button {
-  background-color: rgba(34, 197, 94, 0.8);
+.logout-button {
+  background: var(--danger-red);
   color: white;
 }
 
-.check-in-button:hover:not(:disabled) {
-  background-color: rgba(34, 197, 94, 1);
-  transform: translateY(-2px);
-}
-.check-in-button.disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-  pointer-events: none;
-  background-color: rgba(34, 197, 94, 0.2);
-  color: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  filter: grayscale(100%);
-  text-shadow: none;
+.logout-button:hover {
+  background: var(--danger-hover);
 }
 
-.check-in-button.disabled:hover {
-  transform: none;
-  background-color: rgba(34, 197, 94, 0.2);
+/* Past appointments section */
+.past-appointments-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: calc(100% - 165px);
+  overflow-y: auto;
+  z-index: 2;
+  background: var(--glass-bg);
+  backdrop-filter: var(--background-blur);
+  border-radius: var(--card-radius);
+  margin: 0;
+  padding: 1rem;
+}
+
+.meetings-card.show-past-appointments .appointments-list-container {
+  filter: blur(4px);
+  pointer-events: none;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.past-appointments-title {
+  color: white;
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 1rem 0;
+  text-align: center;
+  width: 100% !important;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--button-radius);
+}
+
+.past-appointments-list {
+  width: 100% !important;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0;
+  margin: 0;
+  max-height: 300px !important;
+  overflow-y: auto;
+}
+
+/* States */
+.button-disabled,
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .checked-in-status {
-  color: #4ade80;
-  font-weight: 600;
-  margin-top: 0.5rem;
+  color: var(--success-green);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
-.check-in-button,
-.delete-button {
-  flex: 1;
-  box-sizing: border-box;
-  padding: 0.8rem 1.2rem;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.2s ease;
-  text-shadow:
-    -1px -1px 0 navy,
-    1px -1px 0 navy,
-    -1px 1px 0 navy,
-    1px 1px 0 navy;
-}
-
-
+/* Loading states */
 .loading-container {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: 2rem;
   color: white;
 }
 
 .loading-spinner {
-  border: 4px solid rgba(255, 255, 255, 0.3);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid white;
   border-radius: 50%;
-  border-top: 4px solid white;
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   margin: 0 auto 1rem;
   animation: spin 1s linear infinite;
 }
@@ -248,150 +337,56 @@
   100% { transform: rotate(360deg); }
 }
 
+/* Error states */
 .error-message {
-  background-color: rgba(239, 68, 68, 0.1);
+  background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.2);
-  padding: 1rem;
-  border-radius: 8px;
-  text-align: center;
   color: white;
+  padding: 1rem;
+  border-radius: var(--button-radius);
+  text-align: center;
   margin: 1rem 0;
 }
 
 .no-appointments {
   text-align: center;
   color: white;
-  font-size: 1.2rem;
-  padding: 2rem;
 }
 
-@media screen and (max-width: 1024px) {
-  .meetings-container {
-    padding: 1.5rem;
-    margin: 1.5rem;
-  }
-
-  .meetings-card {
-    padding: 1.5rem;
-  }
-
-  .meetings-card h2 {
-    font-size: 2rem;
-  }
-
-  .appointment-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .meetings-container {
-    padding: 1rem;
-    margin: 1rem;
-  }
-
-  .appointment-item {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .delete-button {
-    width: 100%;
-    margin-left: 0;
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .button-group {
-    width: 100%;
-    flex-direction: column;
-  }
-
-  .check-in-button {
-    width: 100%;
-    margin-left: 0;
-  }
-}
-
-.toggle-past-button {
-  width: 100%;
-  padding: 0.8rem;
-  margin: 0 0;
-  background-color: rgba(100, 116, 139, 0.8);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-shadow:
-    -1px -1px 0 navy,
-    1px -1px 0 navy,
-    -1px 1px 0 navy,
-    1px 1px 0 navy;
-}
-
-.toggle-past-button:hover {
-  background-color: rgba(100, 116, 139, 1);
-  transform: translateY(-2px);
-}
-
-.past-appointments-container {
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 2px solid rgba(255, 255, 255, 0.1);
-  flex: 1;
-  overflow: hidden;
-  position: relative;
-}
-
-.appointments-section {
-  display: flex;
-  flex-direction: column;
-  max-height: 60vh !important; /* Limit height for scrolling */
-  overflow: hidden;
-  margin-bottom: 1rem;
-}
-
-/* Make past appointments list scrollable */
-.past-appointments-container .appointments-list {
-  height: 100%;
-  max-height: 80vh !important;
-  overflow-y: auto;
-  padding-right: 10px;
-}
-
-/* Apply same scrollbar styling */
-.past-appointments-container .appointments-list::-webkit-scrollbar {
+/* Scrollbar styling */
+.appointments-list-container::-webkit-scrollbar,
+.past-appointments-container::-webkit-scrollbar {
   width: 8px;
 }
 
-.past-appointments-container .appointments-list::-webkit-scrollbar-track {
+.appointments-list-container::-webkit-scrollbar-track,
+.past-appointments-container::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
 }
 
-.past-appointments-container .appointments-list::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.3);
+.appointments-list-container::-webkit-scrollbar-thumb,
+.past-appointments-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
   border-radius: 4px;
 }
 
-/* Update past appointment styling to match current */
-.past-appointment {
-  background-color: rgba(59, 131, 246, 0.7);
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
+/* Responsive design */
+@media (max-width: 768px) {
+  .meetings-container {
+    padding: 0.5rem;
+  }
 
-.past-appointment:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  .meetings-card {
+    padding: 1rem;
+  }
+
+  .meetings-card h2 {
+    font-size: 1.75rem;
+  }
+
+  .button-group-apt button {
+    width: 75px !important;
+    font-size: 0.8rem !important;
+  }
 }

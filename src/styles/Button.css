@@ -29,7 +29,7 @@
 .button--faculty-change:hover,
 .change-faculty-button:hover,
 .back-button:hover {
-  background-color: rgba(100, 116, 139, 0.9) !important;
+  background-color: rgba(252, 8, 20, 0.9) !important;
 }
 
 /* Danger/Cancel button styling */
