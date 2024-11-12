@@ -550,7 +550,7 @@ const ViewMeetings = () => {
                         <div className="checked-in-status">✓ Checked In</div>
                       )}
                     </div>
-                    <div className="button-group">
+                    <div className="button-group-apt">
                       <Button
                         onClick={() => handleCheckin(appointment.id)}
                         className={`check-in-button ${canCheckIn(appointment) !== 'ready' ? 'disabled' : ''}`}
@@ -569,7 +569,7 @@ const ViewMeetings = () => {
                       </Button>
                       <Button
                         onClick={() => handleDelete(appointment.id)}
-                        className="delete-button"
+                        className="cancel-button"
                         disabled={deletingId === appointment.id}
                       >
                         {deletingId === appointment.id ? 'Canceling...' : 'Cancel'}
