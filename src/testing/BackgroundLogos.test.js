@@ -2,46 +2,52 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import BackgroundLogos from '../components/BackgroundLogos';
 import useBackgroundLogos from '../hooks/useBackgroundLogos';
-import '@testing-library/jest-dom'; // Correct import for jest-dom
+import '@testing-library/jest-dom';
 
-// Mocking the custom hook and CSS import
-jest.mock('../hooks/useBackgroundLogos'); 
-jest.mock('../styles/BackgroundLogos.css', () => ({}));
+jest.mock('../hooks/useBackgroundLogos');
 
 describe('BackgroundLogos Component', () => {
-    // Mock data to simulate the logo positions and styles
-    const mockLogoData = [
-        { size: 50, top: 20, left: 30, opacity: 0.8, rotation: 10 }, 
-        { size: 70, top: 50, left: 60, opacity: 0.5, rotation: 45 }, 
-    ]; 
+  const logoSrc = 'test-logo.png';
+  const mockLogos = [
+    { size: 50, top: 10, left: 20, opacity: 0.8, rotation: 30 },
+    { size: 75, top: 30, left: 50, opacity: 0.6, rotation: 45 },
+  ];
 
-    // Before each test, return the mock data from the hook
-    beforeEach(() => {
-        useBackgroundLogos.mockReturnValue(mockLogoData);
-    }); 
+  beforeEach(() => {
+    useBackgroundLogos.mockReturnValue(mockLogos);
+  });
 
-    test('renders background logos with correct image source and style', () => {
-        const logoSrc = '/rcnnct.png'; 
-        
-        // Render the component with the mocked logo source
-        render(<BackgroundLogos logoSrc={logoSrc} />);
-        
-        // Get all images with the alt text 'background-logo'
-        const images = screen.getAllByAltText('background-logo');
-        
-        // Assert the correct number of logos are rendered
-        expect(images).toHaveLength(mockLogoData.length);
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
-        // Assert each logo has the correct attributes and styles
-        images.forEach((img, index) => {
-            expect(img).toHaveAttribute('src', logoSrc); 
-            expect(img).toHaveStyle({
-                width: `${mockLogoData[index].size}px`,
-                top: `${mockLogoData[index].top}%`,
-                left: `${mockLogoData[index].left}%`,
-                opacity: `${mockLogoData[index].opacity}`,
-                transform: `translate(-50%, -50%) rotate(${mockLogoData[index].rotation}deg)`,
-            });
-        });
+  it('renders the correct number of logos', () => {
+    render(<BackgroundLogos logoSrc={logoSrc} />);
+
+    const renderedLogos = screen.getAllByAltText('background-logo');
+    expect(renderedLogos).toHaveLength(mockLogos.length);
+  });
+
+  it('applies the correct styles to each logo', () => {
+    render(<BackgroundLogos logoSrc={logoSrc} />);
+
+    const renderedLogos = screen.getAllByAltText('background-logo');
+
+    renderedLogos.forEach((logo, index) => {
+      expect(logo).toHaveStyle(`width: ${mockLogos[index].size}px`);
+      expect(logo).toHaveStyle(`top: ${mockLogos[index].top}%`);
+      expect(logo).toHaveStyle(`left: ${mockLogos[index].left}%`);
+      expect(logo).toHaveStyle(`opacity: ${mockLogos[index].opacity}`);
+      expect(logo).toHaveStyle(`transform: translate(-50%, -50%) rotate(${mockLogos[index].rotation}deg)`);
     });
+  });
+
+  it('applies the correct src to each logo', () => {
+    render(<BackgroundLogos logoSrc={logoSrc} />);
+
+    const renderedLogos = screen.getAllByAltText('background-logo');
+    renderedLogos.forEach((logo) => {
+      expect(logo).toHaveAttribute('src', logoSrc);
+    });
+  });
 });

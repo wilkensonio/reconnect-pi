@@ -1,15 +1,20 @@
-// LogoutButton.test.js
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react';
-import { useNavigate } from 'react-router-dom';
+import { render, fireEvent, screen, waitFor } from '@testing-library/react';
+import LogoutButton from '../components/LogoutButton';
+import { MemoryRouter } from 'react-router-dom';
 import { apiService } from '../services/api';
 import { useAppContext } from '../context/AppContext';
-import LogoutButton from '../components/LogoutButton';
+import '@testing-library/jest-dom';
 
-// Mock dependencies
-jest.mock('react-router-dom', () => ({
-  useNavigate: jest.fn(),
-}));
+beforeAll(() => {
+  global.import = {
+    meta: {
+      env: {
+        VITE_APP_API_KEY: 'mock_api_key', 
+      },
+    },
+  };
+});
 
 jest.mock('../services/api', () => ({
   apiService: {
@@ -21,57 +26,67 @@ jest.mock('../context/AppContext', () => ({
   useAppContext: jest.fn(),
 }));
 
-describe('LogoutButton', () => {
-  it('calls logout and navigates to home page when clicked', async () => {
+jest.mock('../components/Button', () => ({ onClick, className, children }) => (
+  <button onClick={onClick} className={className}>{children}</button>
+));
+
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: jest.fn(),
+}));
+
+describe('LogoutButton Component', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('logs the user out and navigates to the homepage on button click', async () => {
     const mockLogout = jest.fn();
     const mockNavigate = jest.fn();
-    useNavigate.mockReturnValue(mockNavigate);
     useAppContext.mockReturnValue({ logout: mockLogout });
-    apiService.logout.mockResolvedValueOnce();
+    apiService.logout.mockResolvedValueOnce({});
+    require('react-router-dom').useNavigate.mockReturnValue(mockNavigate);
 
-    const { getByText } = render(<LogoutButton />);
+    render(
+      <MemoryRouter>
+        <LogoutButton />
+      </MemoryRouter>
+    );
 
-    // Simulate a click on the "Logout" button
-    fireEvent.click(getByText('Logout'));
+    fireEvent.click(screen.getByText('Logout'));
 
-    // Wait for the async calls to complete
     await waitFor(() => {
-      // Check that apiService.logout was called
-      expect(apiService.logout).toHaveBeenCalledTimes(1);
-
-      // Check that the logout function from context was called
       expect(mockLogout).toHaveBeenCalledTimes(1);
-
-      // Check that the navigate function was called with '/'
       expect(mockNavigate).toHaveBeenCalledWith('/');
+      expect(apiService.logout).toHaveBeenCalledTimes(1);
     });
   });
 
-  it('handles errors during logout gracefully', async () => {
-    const mockNavigate = jest.fn();
+  it('handles errors during logout', async () => {
     const mockLogout = jest.fn();
-    useNavigate.mockReturnValue(mockNavigate);
+    const mockNavigate = jest.fn();
+    const mockError = new Error('Logout failed');
     useAppContext.mockReturnValue({ logout: mockLogout });
-    apiService.logout.mockRejectedValueOnce(new Error('Logout failed'));
+    apiService.logout.mockRejectedValueOnce(mockError);
+    require('react-router-dom').useNavigate.mockReturnValue(mockNavigate);
 
-    // Mock console.error to track error logging
-    const consoleErrorMock = jest.spyOn(console, 'error').mockImplementation();
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
-    const { getByText } = render(<LogoutButton />);
+    render(
+      <MemoryRouter>
+        <LogoutButton />
+      </MemoryRouter>
+    );
 
-    // Simulate a click on the "Logout" button
-    fireEvent.click(getByText('Logout'));
+    fireEvent.click(screen.getByText('Logout'));
 
-    // Wait for async code to finish
     await waitFor(() => {
-      // Ensure navigate was not called if logout failed
+      expect(mockLogout).not.toHaveBeenCalled();
       expect(mockNavigate).not.toHaveBeenCalled();
-
-      // Check if the error was logged
-      expect(consoleErrorMock).toHaveBeenCalledWith('Error during logout:', expect.any(Error));
-
-      // Restore the original console.error
-      consoleErrorMock.mockRestore();
+      expect(apiService.logout).toHaveBeenCalledTimes(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Error during logout:', mockError);
     });
+
+    consoleErrorSpy.mockRestore();
   });
 });

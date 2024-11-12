@@ -1,84 +1,106 @@
-import logoSrc from '/rcnnct.png';
+import React from 'react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import FacultySelection from '../components/FacultySelection';
+import { MemoryRouter } from 'react-router-dom';
+import { apiService } from '../services/api';
+import { useAppContext } from '../context/AppContext';
+import '@testing-library/jest-dom';
 
-test('should import the logo image', () => {
-  expect(logoSrc).toBe('test-file-stub');
-});
+jest.mock('../services/api');
+jest.mock('../context/AppContext', () => ({
+  useAppContext: jest.fn(),
+}));
+//failed
+const mockUseNavigate = jest.fn();
 
-describe('Token Validation Logic', () => {
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: () => mockUseNavigate,
+}));
+
+describe('FacultySelection Component', () => {
+  const mockFacultyData = [
+    {
+      id: '70578617',
+      user_id: '70578617',
+      first_name: 'J',
+      last_name: 'Escobar',
+      title: 'Professor',
+      department: 'Computer Science',
+    },
+  ];
+
   beforeEach(() => {
-    localStorage.clear();
-    delete global.location; 
+    jest.clearAllMocks();
+    apiService.getAllFaculty.mockResolvedValue(mockFacultyData);
+    useAppContext.mockReturnValue({ user: { name: 'Test User' } });
   });
 
-  it('should show error if no token and the user is on the login page', () => {
-    global.location = { state: { from: '/login' } };
+  it('renders loading state initially', async () => {
+    render(<FacultySelection />);
+    await waitFor(() => expect(screen.getByText(/loading faculty members.../i)).toBeInTheDocument());
+  });
+  
 
-    localStorage.removeItem('reconnect_access_token');
+  it('displays faculty members once data is fetched', async () => {
+    render(
+      <MemoryRouter>
+        <FacultySelection />
+      </MemoryRouter>
+    );
 
-    const setError = jest.fn();
-
-    const token = localStorage.getItem('reconnect_access_token');
-    if (!token) {
-      if (location.state?.from === '/login') {
-        setError('Authentication required to view faculty members.');
-      }
-    }
-
-    expect(setError).toHaveBeenCalledWith('Authentication required to view faculty members.');
+    await waitFor(() => {
+      expect(screen.getByText(/Select a Faculty Member/i)).toBeInTheDocument();
+      expect(screen.getByText(/Escobar, J/i)).toBeInTheDocument();
+    });
   });
 
-  it('should use sample data if no token and not on the login page', () => {
-    global.location = { state: { from: '/some-other-page' } };
+  it('displays error message if authentication fails', async () => {
+    // Mock authentication failure
+    mockAuthFail();
+  
+    render(<FacultySelection />);
+    await waitFor(() => expect(screen.getByText(/Authentication required to view faculty members./i)).toBeInTheDocument());
+  });
+  
 
-    localStorage.removeItem('reconnect_access_token');
+  it('navigates to login if user is not authenticated', async () => {
+    useAppContext.mockReturnValue({ user: null });
 
-    const setFaculty = jest.fn();
+    render(
+      <MemoryRouter>
+        <FacultySelection />
+      </MemoryRouter>
+    );
 
-    const sampleData = [{
-      id: "70578617",
-      user_id: "70578617",
-      first_name: "J",
-      last_name: "Escobar",
-      title: "Professor",
-      department: "Computer Science"
-    }];
-    
-    const token = localStorage.getItem('reconnect_access_token');
-    if (!token) {
-      setFaculty(sampleData);
-    }
-
-    expect(setFaculty).toHaveBeenCalledWith(sampleData);
+    await waitFor(() => {
+      fireEvent.click(screen.getByText(/Escobar, J/i));
+      expect(mockUseNavigate).toHaveBeenCalledWith('/login');
+    });
   });
 
-  it('should fetch faculty if token exists', async () => {
-    global.location = { state: { from: '/faculty' } };
+  it('navigates to home if user selects a faculty member and is authenticated', async () => {
+    render(<FacultySelection />);
+    mockAuthSuccess();
+    const facultyMember = screen.getByText(/Faculty Member Name/i);
+    fireEvent.click(facultyMember);
+  
+    await waitFor(() => expect(mockHistoryPush).toHaveBeenCalledWith('/home'));
+  });
+  
 
-    const mockToken = 'valid-token-123';
-    localStorage.setItem('reconnect_access_token', mockToken);
+  it('renders retry button if error occurs and retries on button click', async () => {
+    apiService.getAllFaculty.mockRejectedValueOnce(new Error('Network error'));
 
-    const facultyData = [{
-      id: "70578617",
-      user_id: "70578617",
-      first_name: "J",
-      last_name: "Escobar",
-      title: "Professor",
-      department: "Computer Science"
-    }];
-    
-    const apiService = {
-      getAllFaculty: jest.fn().mockResolvedValue(facultyData),
-    };
+    render(
+      <MemoryRouter>
+        <FacultySelection />
+      </MemoryRouter>
+    );
 
-    const setFaculty = jest.fn();
-
-    const token = localStorage.getItem('reconnect_access_token');
-    if (token) {
-      const facultyMembers = await apiService.getAllFaculty();
-      setFaculty(facultyMembers);
-    }
-
-    expect(apiService.getAllFaculty).toHaveBeenCalled();
-    expect(setFaculty).toHaveBeenCalledWith(facultyData);
+    await waitFor(() => {
+      expect(screen.getByText(/Failed to load faculty members. Please try again later./i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument();
+    });
   });
 });
