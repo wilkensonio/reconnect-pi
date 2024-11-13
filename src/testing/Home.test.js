@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import Home from '../components/Home'; // Adjust the import path as needed
-import { apiService } from '../services/api'; // Mock the apiService
+import Home from '../components/Home'; 
+import { apiService } from '../services/api'; 
 import { AppProvider } from '../context/AppContext'; 
 
 jest.mock('../services/api', () => ({
@@ -14,7 +14,7 @@ jest.mock('../services/api', () => ({
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useNavigate: () => mockNavigate, // 
+  useNavigate: () => mockNavigate, 
 }));
 
 beforeAll(() => {
@@ -33,10 +33,10 @@ beforeEach(() => {
 
 describe('Home component', () => {
   test('renders correctly and navigates based on facultyId', async () => {
-    const mockFacultyInfo = { last_name: 'Smith' };
+    const mockFacultyInfo = { last_name: 'DeCesare' };
     apiService.getFacultyInfo.mockResolvedValue(mockFacultyInfo);
     
-    sessionStorage.setItem('selected_faculty_id', '70578617');
+    sessionStorage.setItem('selected_faculty_id', '70570685');
 
     render(
       <MemoryRouter>
@@ -47,7 +47,7 @@ describe('Home component', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/Prof. Smith's Office/)).toBeInTheDocument();
+      expect(screen.getByText(/Prof. DeCesare's Office/)).toBeInTheDocument();
     });
 
     expect(screen.getByText(/Schedule Meeting/)).toBeInTheDocument();
@@ -73,10 +73,10 @@ describe('Home component', () => {
   });
 
   test('navigates to schedule page on button click', async () => {
-    const mockFacultyInfo = { last_name: 'Smith' };
+    const mockFacultyInfo = { last_name: 'DeCesare' };
     apiService.getFacultyInfo.mockResolvedValue(mockFacultyInfo);
     
-    sessionStorage.setItem('selected_faculty_id', '70578617');
+    sessionStorage.setItem('selected_faculty_id', '70570685');
 
     render(
       <MemoryRouter>
@@ -92,10 +92,10 @@ describe('Home component', () => {
   });
 
   test('handles faculty change and redirects', async () => {
-    const mockFacultyInfo = { last_name: 'Smith' };
+    const mockFacultyInfo = { last_name: 'DeCesare' };
     apiService.getFacultyInfo.mockResolvedValue(mockFacultyInfo);
     
-    sessionStorage.setItem('selected_faculty_id', '70578617');
+    sessionStorage.setItem('selected_faculty_id', '70570685');
 
     render(
       <MemoryRouter>
