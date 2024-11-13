@@ -132,16 +132,15 @@ const PiMessageModal = ({ messages, onClose }) => {
 
     const currentMessage = activeMessages[currentIndex];
     if (!currentMessage) {
-        console.log('startTime', currentMessage.startTime);
-        console.log('expiryTime', currentMessage.expiryTime);
         return null;
     }
 
     const isLastMessage = currentIndex === activeMessages.length - 1;
     const showPreviousButton = currentIndex > 0;
 
-
-
+    console.log('startTime', currentMessage.startTime);
+    console.log('expiryTime', currentMessage.expiryTime);
+    
     return (
         <div className="message-page">
             <BackgroundLogos logoSrc="/rcnnct.png" />
