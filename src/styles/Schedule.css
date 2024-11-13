@@ -1,0 +1,201 @@
+/* Schedule.css */
+
+.schedule {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100vw;
+  position: relative;
+}
+
+.schedule-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1400px;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.top-card,
+.left-card,
+.right-card {
+  background-color: rgba(0, 0, 195, 0.2); /* Semi-transparent background */
+  backdrop-filter: blur(10px); /* Apply blur effect */
+  border-radius: 25px;
+  padding: 1rem;
+  margin: 0.5rem;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  border: 3px solid rgba(255, 255, 255, 1); /* Semi-transparent border */
+  position: relative;
+  box-sizing: border-box;
+}
+
+.top-card {
+  padding: .6rem;
+  text-align: center;
+  color: white;
+  font-size: 1.8rem;
+  font-weight: bolder;;
+  text-shadow:
+    -1px -1px 0 navy,
+    1px -1px 0 navy,
+    -1px 1px 0 navy,
+    1px 1px 0 navy;
+}
+
+.content-cards {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+}
+
+.left-card {
+  flex: 2;
+  margin-right: 0.5rem;
+}
+
+.right-card {
+  flex: 1;
+  margin-left: 0.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.left-card h2,
+.right-card h2 {
+  color: white;
+  text-align: center;
+  font-size: 1.8rem;
+  margin: 0 0 1rem 0;
+  text-shadow:
+    -1px -1px 0 navy,
+    1px -1px 0 navy,
+    -1px 1px 0 navy,
+    1px 1px 0 navy;
+}
+
+.calendar-wrapper {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+  color: #ffffff;
+  text-shadow:
+    -1px -1px 0 navy,
+    1px -1px 0 navy,
+    -1px 1px 0 navy,
+    1px 1px 0 navy;
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.9rem;
+  border: 1px solid var(--dropdown-border);
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  box-sizing: border-box;
+}
+
+.input-field::placeholder {
+  color: #ffffff;
+  opacity: 0.7;
+}
+
+.input-dropdown-container {
+  position: relative;
+  padding: 0.6rem 0.8rem;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 80px;
+  overflow-y: auto;
+  background-color: rgba(8, 35, 153, 0.85);
+  border: 1px solid var(--accent-color);
+  border-radius: 8px;
+  z-index: 1000;
+}
+
+.dropdown-item {
+  padding: 0.6rem 0.8rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #ffffff;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(59, 131, 246, 0.959);
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: auto;
+}
+
+.full-width-button {
+  width: 100%;
+  font-size: 1rem;
+  padding: 0.6rem 0.8rem;
+  color: #ffffff;
+  background-color: rgba(59, 131, 246, 0.959);
+  border: 1px solid navy;
+  text-shadow:
+    -1px -1px 0 navy,
+    1px -1px 0 navy,
+    -1px 1px 0 navy,
+    1px 1px 0 navy;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.full-width-button:hover {
+  background-color: rgba(59, 130, 246, 1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.submit-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.error-message {
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 0.8rem;
+  border-radius: 8px;
+  text-align: center;
+  color: white;
+  margin: 0.8rem 0;
+}
+
+/* Adjusted font sizes and padding to make the components smaller and fit better on smaller screens */
+
+/* Ensure the form inside .right-card takes up available space */
+.right-card form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.button-disabled {
+  background-color: #cccccc !important;
+  cursor: not-allowed !important;
+  opacity: 0.7;
+}
+

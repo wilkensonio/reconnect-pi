@@ -1,0 +1,264 @@
+/* Calendar.css */
+
+.custom-calendar {
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 14px;
+  box-shadow: 0 12px 10px rgba(0, 0, 0, 0.2);
+  background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent background */
+  backdrop-filter: blur(10px); /* Apply blur effect */
+  color: #1444c9;
+  padding: 0.8rem;
+  width: 100%;
+  display: flex;
+  position: relative;
+  z-index: 2;
+}
+
+.custom-calendar .react-datepicker__month-container {
+  width: 70%;
+  border-top-right-radius: 0; /* Remove top-right radius to seamlessly connect with time container */
+  border-bottom-left-radius: 0; /* Remove bottom-left radius for seamless connection */
+}
+
+.custom-calendar .react-datepicker__header {
+  background-color: rgba(58, 139, 253, 0.8); /* Semi-transparent background */
+  backdrop-filter: blur(10px); /* Apply blur effect */
+  border-bottom: none;
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+  padding-top: 0.8rem;
+  height: 104px; /* Increased height to accommodate day titles */
+  position: relative;
+  display: block; /* Remove flexbox to prevent interference with absolute positioning */
+}
+
+/* Center the month/year title at the top of the header */
+.custom-calendar .react-datepicker__current-month {
+  position: absolute;
+  top: 10px; /* Position near the top */
+  left: 50%;
+  transform: translateX(-50%);
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 1.3rem;
+  padding: 0.4rem 0;
+  text-shadow:
+    -1px -1px 0 navy,
+    1px -1px 0 navy,
+    -1px 1px 0 navy,
+    1px 1px 0 navy;
+}
+
+/* Position the day titles at the bottom of the header */
+.custom-calendar .react-datepicker__day-names {
+  position: absolute;
+  bottom: 5px; /* Position 10px from the bottom */
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around; /* Evenly distribute day names */
+  padding: 0 1rem; /* Add horizontal padding */
+}
+
+.custom-calendar .react-datepicker__day-name,
+.custom-calendar .react-datepicker__day {
+  width: 2.4rem;
+  line-height: 2.2rem;
+  margin: 0.4rem;
+  color: #1c11b8;
+  text-align: center; /* Ensure day names and days are centered */
+}
+
+.custom-calendar .react-datepicker__day-name {
+  font-weight: bold;
+}
+
+.custom-calendar .react-datepicker__day:hover {
+  background-color: #e6f2ff;
+  color: #1f6feb;
+  border-radius: 50%;
+}
+
+.custom-calendar .react-datepicker__day--selected,
+.custom-calendar .react-datepicker__day--keyboard-selected {
+  background-color: #1f6feb;
+  color: #ffffff;
+  border-radius: 50%;
+}
+
+.custom-calendar .react-datepicker__navigation--previous,
+.custom-calendar .react-datepicker__navigation--next {
+  top: 9%;
+  border-radius: 100%;
+  width: 24px;
+  max-height: 15px;
+}
+
+.custom-calendar .react-datepicker__navigation--previous {
+  left: 35px;
+  height: 20px;
+}
+
+.custom-calendar .react-datepicker__navigation--next {
+  right: 200px;
+  height: 20px;
+}
+
+.custom-calendar .react-datepicker__navigation-icon::before {
+  font-size: 0.9rem;
+  color: #057ef0;
+}
+
+
+.custom-calendar .available-date {
+  background-color: #5694e69a;
+  color: white;
+  border-radius: 50%;
+}
+
+.custom-calendar .react-datepicker__time-container {
+  border-left: 1px solid #313c9c;
+  width: 30%;
+  background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent background */
+  backdrop-filter: blur(10px); /* Apply blur effect */
+  border-top-right-radius: 14px; /* Rounded top-right corner */
+  border-bottom-right-radius: 14px; /* Rounded bottom-right corner */
+}
+
+.custom-calendar .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box {
+  width: 100%;
+}
+
+.custom-calendar .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item {
+  padding: 8px 4px;
+  font-size: 1.2rem;
+  color: navy;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding-top: 2rem;
+}
+
+.calendar-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.unavailable-date {
+  color: #999999 !important;
+  background-color: #f0f0f080 !important;
+  cursor: not-allowed !important;
+  opacity: 0.5 !important;
+  pointer-events: none !important;
+  border-radius: 50%;
+}
+
+.unavailable-time {
+  display: none !important;
+}
+
+.react-datepicker .react-datepicker__time {
+  background: rgba(255, 255, 255, 0.2); /* Semi-transparent background */
+  backdrop-filter: blur(10px); /* Apply blur effect */
+}
+
+.custom-calendar .react-datepicker__day--selected {
+  color: #ffffff;
+  background-color: #1f6feb;
+}
+
+.custom-calendar .react-datepicker__header,
+.custom-calendar .react-datepicker-time__header {
+  height: 80px;
+}
+
+.custom-calendar .react-datepicker__time-name {
+  color: #11176d;
+  font-weight: bold;
+}
+
+.custom-calendar .react-datepicker {
+  border: 2px solid #0f37bb;
+  border-radius: 16px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.custom-calendar .react-datepicker__header {
+  background: linear-gradient(135deg, #0f37bb, #1f6feb);
+  color: #ffffff;
+  border-bottom: 1px solid #0f37bb;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+.custom-calendar .react-datepicker__day:hover {
+  background-color: #3e3cdb;
+  color: rgb(243, 243, 248);
+  border-radius: 50%;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.react-datepicker__time-list-item:hover:not(.react-datepicker__time-list-item--disabled) {
+  background: linear-gradient(135deg, #0f37bb, #1f6feb) !important;
+  color: white !important;
+}
+
+.react-datepicker__time-list-item--selected {
+  background: linear-gradient(135deg, #0f37bb, #1f6feb) !important;
+  color: white !important;
+}
+
+/* Remove the text "Time" and keep only the icon */
+.custom-calendar .react-datepicker-time__header {
+  font-size: 0; /* Hide any text */
+}
+
+.custom-calendar .react-datepicker-time__header::before {
+  content: "\f017"; /* Font Awesome icon */
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2.5rem;
+  color: #1234a5;
+}
+
+/* Ensure the headers for time and date flow into one another */
+.custom-calendar .react-datepicker__header {
+  display: block; /* Remove flexbox to prevent interference with absolute positioning of the title */
+}
+
+/* Rounded borders for calendar and time containers to match the card */
+.custom-calendar .react-datepicker__month-container,
+.custom-calendar .react-datepicker__time-container {
+  border-radius: 14px;
+}
+
+/* Remove overlapping borders between month and time containers */
+.custom-calendar .react-datepicker__month-container {
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+}
+
+.custom-calendar .react-datepicker__time-container {
+  border-top-right-radius: 14px;
+  border-bottom-right-radius: 14px;
+}
+
+/* Ensure smooth transition between month and time containers */
+.custom-calendar .react-datepicker__month-container,
+.custom-calendar .react-datepicker__time-container {
+  overflow: hidden;
+}
+
+/* Maintain consistent shadow and border styles */
+.custom-calendar .react-datepicker__month-container,
+.custom-calendar .react-datepicker__time-container {
+  box-shadow: none;
+}
