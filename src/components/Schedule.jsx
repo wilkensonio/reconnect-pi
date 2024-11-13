@@ -102,9 +102,9 @@ const Schedule = () => {
   }, [isReasonDropdownVisible, isDurationDropdownVisible]);
 
   useEffect(() => {
-    if (!selectedDate) {
+    if (!isDateSelected) {
       setCurrentStep(1);
-    } else if (!selectedTime) {
+    } else if (!isTimeSelected) {
       setCurrentStep(2);
     } else if (!reason) {
       setCurrentStep(3);
@@ -113,10 +113,11 @@ const Schedule = () => {
     } else {
       setCurrentStep(5);
     }
-  }, [selectedDate, selectedTime, reason, selectedDuration]);
+  }, [isDateSelected, isTimeSelected, reason, selectedDuration]);
 
   const handleDateTimeSelect = ({ date }) => {
-    if (!isDateSelected) {
+    if (selectedDate && date.toDateString() !== selectedDate.toDateString()) {
+      // If selecting a different date at any point, reset from there
       setSelectedDate(date);
       setIsDateSelected(true);
       setSelectedTime(null);
@@ -124,19 +125,25 @@ const Schedule = () => {
       setReason('');
       setSelectedDuration('');
       setDurationValue(null);
-    } else if (date.toDateString() !== selectedDate.toDateString()) {
-      // If selecting a different date
+    } else if (!isDateSelected) {
+      // First time selecting a date
       setSelectedDate(date);
+      setIsDateSelected(true);
       setSelectedTime(null);
       setIsTimeSelected(false);
       setReason('');
       setSelectedDuration('');
       setDurationValue(null);
-    } else if (!isTimeSelected) {
+    } else if (!isTimeSelected || (selectedDate && date.toDateString() === selectedDate.toDateString())) {
+      // Selecting or changing time on same date
       setSelectedDate(date);
       setSelectedTime(date.toTimeString().slice(0,5));
       setIsTimeSelected(true);
       computePossibleDurations(date);
+      // Only reset subsequent steps when changing time
+      setReason('');
+      setSelectedDuration('');
+      setDurationValue(null);
     }
   };
 
@@ -199,29 +206,32 @@ const Schedule = () => {
     setMeetingDurations(possibleDurations);
   };
 
+  const handleUpdateDate = (newDate) => {
+    setSelectedDate(newDate);
+    setIsDateSelected(true);
+    setSelectedTime(null);
+    setIsTimeSelected(false);
+    setSelectedDuration('');
+    setDurationValue(null);
+    computePossibleDurations(newDate);
+  };
+
   const handleUpdateTime = (newTime) => {
     setSelectedTime(newTime);
     setIsTimeSelected(true);
-    setReason('');
-    setSelectedDuration('');
-    setDurationValue(null);
     const timeDate = new Date(selectedDate);
     const [hours, minutes] = newTime.split(':').map(Number);
     timeDate.setHours(hours, minutes);
     computePossibleDurations(timeDate);
   };
 
-  const handlePredefinedMessageClick = (message) => {
-    setReason(message);
-    setSelectedDuration('');
-    setDurationValue(null);
-    setIsReasonDropdownVisible(false);
-  };
-
-  const handleDurationSelect = (duration) => {
+  const handleUpdateDuration = (duration) => {
     setSelectedDuration(duration.label);
     setDurationValue(duration.value);
-    setIsDurationDropdownVisible(false);
+  };
+
+  const handleUpdateReason = (newReason) => {
+    setReason(newReason);
   };
 
   const handleSubmit = (e) => {
@@ -265,6 +275,17 @@ const Schedule = () => {
     }
   };
 
+  const handlePredefinedMessageClick = (message) => {
+    setReason(message);
+    setIsReasonDropdownVisible(false);
+  };
+
+  const handleDurationSelect = (duration) => {
+    setSelectedDuration(duration.label);
+    setDurationValue(duration.value);
+    setIsDurationDropdownVisible(false);
+  };
+
   const getStepPrompt = () => {
     switch (currentStep) {
       case 1:
@@ -285,7 +306,7 @@ const Schedule = () => {
   return (
     <div className="schedule">
       <BackgroundLogos logoSrc={logoSrc} />
-      <div className="schedule-container">
+      <div className="schedule-container" style={{ position: 'relative' }}>
         <div className="top-card">
           Schedule Meeting with: Prof. {facultyInfo?.last_name}
         </div>
