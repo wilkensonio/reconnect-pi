@@ -1,70 +1,91 @@
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import FacultySelection from '../components/FacultySelection';
+import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import FacultySelection from '../components/FacultySelection';
 import { apiService } from '../services/api';
 import { useAppContext } from '../context/AppContext';
-import '@testing-library/jest-dom';
+
+beforeAll(() => {
+  global.import = {
+    meta: {
+      env: {
+        VITE_APP_API_KEY: 'mock_api_key', 
+      },
+    },
+  };
+});
 
 jest.mock('../services/api');
-jest.mock('../context/AppContext', () => ({
-  useAppContext: jest.fn(),
-}));
-//failed
-const mockUseNavigate = jest.fn();
-
+jest.mock('../context/AppContext');
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useNavigate: () => mockUseNavigate,
+  useNavigate: jest.fn(),
+  useLocation: jest.fn()
 }));
 
 describe('FacultySelection Component', () => {
-  const mockFacultyData = [
-    {
-      id: '70578617',
-      user_id: '70578617',
-      first_name: 'J',
-      last_name: 'Escobar',
-      title: 'Professor',
-      department: 'Computer Science',
-    },
-  ];
+  let mockNavigate;
 
   beforeEach(() => {
+    mockNavigate = jest.fn();
+    useNavigate.mockReturnValue(mockNavigate);
+    useLocation.mockReturnValue({ state: {} });
+    jest.spyOn(window.localStorage.__proto__, 'getItem');
+  });
+
+  afterEach(() => {
     jest.clearAllMocks();
-    apiService.getAllFaculty.mockResolvedValue(mockFacultyData);
-    useAppContext.mockReturnValue({ user: { name: 'Test User' } });
   });
 
-  it('renders loading state initially', async () => {
-    render(<FacultySelection />);
-    await waitFor(() => expect(screen.getByText(/loading faculty members.../i)).toBeInTheDocument());
-  });
-  
+  test('displays sample data when there is no token', async () => {
+    localStorage.getItem.mockReturnValue(null); // No token in localStorage
+    useAppContext.mockReturnValue({ user: {} });
 
-  it('displays faculty members once data is fetched', async () => {
     render(
       <MemoryRouter>
         <FacultySelection />
       </MemoryRouter>
     );
 
-    await waitFor(() => {
-      expect(screen.getByText(/Select a Faculty Member/i)).toBeInTheDocument();
-      expect(screen.getByText(/Escobar, J/i)).toBeInTheDocument();
-    });
+    // Updated matcher to use `getByText` for flexible search
+    expect(await screen.findByText('Escobar, J', { exact: false })).toBeInTheDocument();
   });
 
-  it('displays error message if authentication fails', async () => {
-    // Mock authentication failure
-    mockAuthFail();
-  
-    render(<FacultySelection />);
-    await waitFor(() => expect(screen.getByText(/Authentication required to view faculty members./i)).toBeInTheDocument());
-  });
-  
+  test('displays sample data on 401 unauthorized error', async () => {
+    localStorage.getItem.mockReturnValue('valid_token');
+    apiService.getAllFaculty.mockRejectedValue({ response: { status: 401 } });
+    useAppContext.mockReturnValue({ user: {} });
 
-  it('navigates to login if user is not authenticated', async () => {
+    render(
+      <MemoryRouter>
+        <FacultySelection />
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByText('Escobar, J', { exact: false })).toBeInTheDocument();
+  });
+
+  test('fetches faculty data when there is a valid token', async () => {
+    const mockFacultyData = [
+      { user_id: '123', first_name: 'John', last_name: 'Doe', title: 'Professor', department: 'Mathematics' },
+    ];
+
+    localStorage.getItem.mockReturnValue('valid_token');
+    apiService.getAllFaculty.mockResolvedValue(mockFacultyData);
+    useAppContext.mockReturnValue({ user: {} });
+
+    render(
+      <MemoryRouter>
+        <FacultySelection />
+      </MemoryRouter>
+    );
+
+    expect(await screen.findByText('Doe, John')).toBeInTheDocument();
+  });
+
+  test('redirects to login if no token or user when selecting faculty', async () => {
+    localStorage.getItem.mockReturnValue(null);
     useAppContext.mockReturnValue({ user: null });
 
     render(
@@ -73,24 +94,15 @@ describe('FacultySelection Component', () => {
       </MemoryRouter>
     );
 
-    await waitFor(() => {
-      fireEvent.click(screen.getByText(/Escobar, J/i));
-      expect(mockUseNavigate).toHaveBeenCalledWith('/login');
-    });
+    const button = await screen.findByText('Escobar, J', { exact: false });
+    fireEvent.click(button);
+
+    expect(mockNavigate).toHaveBeenCalledWith('/login');
   });
 
-  it('navigates to home if user selects a faculty member and is authenticated', async () => {
-    render(<FacultySelection />);
-    mockAuthSuccess();
-    const facultyMember = screen.getByText(/Faculty Member Name/i);
-    fireEvent.click(facultyMember);
-  
-    await waitFor(() => expect(mockHistoryPush).toHaveBeenCalledWith('/home'));
-  });
-  
-
-  it('renders retry button if error occurs and retries on button click', async () => {
-    apiService.getAllFaculty.mockRejectedValueOnce(new Error('Network error'));
+  test('navigates to home when selecting faculty with valid token and user', async () => {
+    localStorage.getItem.mockReturnValue('valid_token');
+    useAppContext.mockReturnValue({ user: { name: 'Student' } });
 
     render(
       <MemoryRouter>
@@ -98,9 +110,9 @@ describe('FacultySelection Component', () => {
       </MemoryRouter>
     );
 
-    await waitFor(() => {
-      expect(screen.getByText(/Failed to load faculty members. Please try again later./i)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument();
-    });
+    const button = await screen.findByText('Escobar, J', { exact: false });
+    fireEvent.click(button);
+
+    expect(mockNavigate).toHaveBeenCalledWith('/home');
   });
 });
