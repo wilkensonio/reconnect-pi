@@ -115,6 +115,38 @@ const Schedule = () => {
     }
   }, [isDateSelected, isTimeSelected, reason, selectedDuration]);
 
+  const handleDateTimeSelect = ({ date }) => {
+    if (selectedDate && date.toDateString() !== selectedDate.toDateString()) {
+      // If selecting a different date at any point, reset from there
+      setSelectedDate(date);
+      setIsDateSelected(true);
+      setSelectedTime(null);
+      setIsTimeSelected(false);
+      setReason('');
+      setSelectedDuration('');
+      setDurationValue(null);
+    } else if (!isDateSelected) {
+      // First time selecting a date
+      setSelectedDate(date);
+      setIsDateSelected(true);
+      setSelectedTime(null);
+      setIsTimeSelected(false);
+      setReason('');
+      setSelectedDuration('');
+      setDurationValue(null);
+    } else if (!isTimeSelected || (selectedDate && date.toDateString() === selectedDate.toDateString())) {
+      // Selecting or changing time on same date
+      setSelectedDate(date);
+      setSelectedTime(date.toTimeString().slice(0,5));
+      setIsTimeSelected(true);
+      computePossibleDurations(date);
+      // Only reset subsequent steps when changing time
+      setReason('');
+      setSelectedDuration('');
+      setDurationValue(null);
+    }
+  };
+
   const isTimeSlotBlocked = (dateTime, duration) => {
     const startTime = new Date(dateTime);
     const endTime = new Date(startTime);
@@ -140,23 +172,6 @@ const Schedule = () => {
         (endTime > blockStart && endTime <= blockEnd)
       );
     });
-  };
-
-  const handleDateTimeSelect = ({ date }) => {
-    if (!isDateSelected) {
-      setSelectedDate(date);
-      setIsDateSelected(true);
-      setSelectedTime(null);
-      setIsTimeSelected(false);
-      setReason('');
-      setSelectedDuration('');
-      setDurationValue(null);
-    } else if (!isTimeSelected) {
-      setSelectedDate(date);
-      setSelectedTime(date.toTimeString().slice(0,5));
-      setIsTimeSelected(true);
-      computePossibleDurations(date);
-    }
   };
 
   const computePossibleDurations = (selectedDateTime) => {
