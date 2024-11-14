@@ -22,41 +22,28 @@ const FacultySelection = () => {
         setLoading(true);
         setError(null);
 
-        // Check if we have a token
         const token = localStorage.getItem('reconnect_access_token');
         
         if (!token) {
-          // If coming from login page, show error
-          if (location.state?.from === '/login') {
-            setError('Authentication required to view faculty members.');
-          } else {
-            // First time visitors or expired token - use sample data temporarily
-            setFaculty([{
-              id: "70578617",
-              user_id: "70578617",
-              first_name: "J",
-              last_name: "Escobar",
-              title: "Professor",
-              department: "Computer Science"
-            }]);
-          }
-        } else {
-          // We have a token, try to fetch faculty
-          const facultyMembers = await apiService.getAllFaculty();
-          setFaculty(facultyMembers);
+          setError('Please log in to view faculty members.');
+          navigate('/login', { state: { from: location.pathname } });
+          return;
         }
+
+        const facultyMembers = await apiService.getAllFaculty();
+        
+        if (!facultyMembers || facultyMembers.length === 0) {
+          setError('No faculty members found.');
+          return;
+        }
+        
+        setFaculty(facultyMembers);
       } catch (error) {
         console.error('Error fetching faculty:', error);
-        // If unauthorized, use sample data
+        
         if (error.response?.status === 401) {
-          setFaculty([{
-            id: "70578617",
-            user_id: "70578617",
-            first_name: "J",
-            last_name: "Escobar",
-            title: "Professor",
-            department: "Computer Science"
-          }]);
+          setError('Your session has expired. Please log in again.');
+          navigate('/login', { state: { from: location.pathname } });
         } else {
           setError('Failed to load faculty members. Please try again later.');
         }
@@ -66,12 +53,13 @@ const FacultySelection = () => {
     };
 
     fetchFaculty();
-  }, [location.state]);
+  }, [location.state, navigate, location.pathname]);
 
   const handleFacultySelect = (facultyId) => {
+    if (!facultyId) return;
+    
     sessionStorage.setItem('selected_faculty_id', facultyId);
     
-    // If no token or user, go to login
     if (!localStorage.getItem('reconnect_access_token') || !user) {
       navigate('/login');
     } else {
@@ -101,31 +89,32 @@ const FacultySelection = () => {
       <div className="faculty-selection-container">
         <div className="faculty-card">
           <h2>Select a Faculty Member</h2>
-          <div className="faculty-grid">
-            {faculty.map((member) => (
-              <div key={member.user_id} className="faculty-item">
-                <button
-                  onClick={() => handleFacultySelect(member.user_id)}
-                  className="faculty-button"
-                >
-                  <div className="faculty-name">
-                    {member.last_name}, {member.first_name}
-                  </div>
-                  <div className="faculty-details">
-                    {member.title || 'Faculty Member'}
-                  </div>
-                  {member.department && (
-                    <div className="faculty-department">
-                      {member.department}
+          {faculty.length > 0 ? (
+            <div className="faculty-grid">
+              {faculty.map((member) => (
+                <div key={member.user_id} className="faculty-item">
+                  <button
+                    onClick={() => handleFacultySelect(member.user_id)}
+                    className="faculty-button"
+                  >
+                    <div className="faculty-name">
+                      {member.last_name}, {member.first_name}
                     </div>
-                  )}
-                </button>
-              </div>
-            ))}
-          </div>
-          {error && (
+                    <div className="faculty-details">
+                      {member.title || 'Faculty Member'}
+                    </div>
+                    {member.department && (
+                      <div className="faculty-department">
+                        {member.department}
+                      </div>
+                    )}
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
             <div className="error-container">
-              <p className="error-message">{error}</p>
+              <p className="error-message">{error || 'No faculty members available.'}</p>
               <Button onClick={() => window.location.reload()}>Try Again</Button>
             </div>
           )}
