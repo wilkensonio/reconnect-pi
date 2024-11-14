@@ -6,6 +6,8 @@
 //     ],
      
 //   };
+    // @babel/preset-env'  enables modern JavaScript features (ES6+) to be used in your tests
+
 {
   "presets": [
     ["@babel/preset-env", { "targets": { "node": "current" } }],
