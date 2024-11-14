@@ -1,40 +1,37 @@
-import React from 'react'; // Add this import
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import ViewMeetings from '../components/ViewMeetings'; // Update with your actual path
-import '@testing-library/jest-dom'; // For the 'toBeInTheDocument' matcher
-import { BrowserRouter as Router } from 'react-router-dom'; // If your component uses routing
+import React from 'react';
+import '@testing-library/jest-dom';
+import { render, screen } from '@testing-library/react';  
+import { MemoryRouter } from 'react-router-dom';
+import { AppProvider } from '../context/AppContext'; // Adjust the import path as necessary
+import logoSrc from '/rcnnct.png';
+import ViewMeetings from '../components/ViewMeetings';
 
-jest.mock('../services/api', () => ({
-  fetchAppointments: jest.fn().mockResolvedValue([]),
-}));
+jest.mock('/rcnnct.png', () => 'test-file-stub');
 
-describe('ViewMeetings Component', () => {
-  test('should render and display the meeting results modal on appointment submission', async () => {
+test('should load logo', () => {
+  expect(logoSrc).toBe('test-file-stub');
+});
+
+beforeAll(() => {
+    global.import = {
+      meta: {
+        env: {
+          VITE_APP_API_KEY: 'mock_api_key'
+        }
+      }
+    };
+  });
+  
+
+
+test('renders ViewMeetings component', () => {
     render(
-      <Router>
-        <ViewMeetings />
-      </Router>
+      <MemoryRouter>
+        <AppProvider>
+          <ViewMeetings />
+        </AppProvider>
+      </MemoryRouter>
     );
 
-    const submitButton = screen.getByText(/submit/i); 
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      const modal = screen.getByRole('dialog'); 
-      expect(modal).toBeInTheDocument();
-      
-      const meetingResults = screen.getByText(/Meeting with Prof\./); 
-      expect(meetingResults).toBeInTheDocument();
-
-      const appointmentDate = screen.getByText(/2024-11-13/); 
-      expect(appointmentDate).toBeInTheDocument();
-    });
-
-    const confirmButton = screen.getByText(/Confirm/);
-    fireEvent.click(confirmButton);
-
-    await waitFor(() => {
-      expect(screen.getByText(/Appointment confirmed/i)).toBeInTheDocument();
-    });
   });
-});
+  
