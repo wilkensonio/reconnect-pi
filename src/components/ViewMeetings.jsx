@@ -56,21 +56,23 @@ const ViewMeetings = () => {
   const navigate = useNavigate();
   const { user } = useAppContext();
 
-  const convertUTCToLocal = (dateStr, timeStr) => {
-    // Create local date object
-    const [hours, minutes] = timeStr.split(':').map(Number);
-    const date = new Date(dateStr);
-    date.setHours(hours, minutes, 0, 0);
+const convertUTCToLocal = (dateStr, timeStr) => {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const [hours, minutes] = timeStr.split(':').map(Number);
   
-    // Debug logging
-    console.log('Time comparison:', {
-      input: `${dateStr} ${timeStr}`,
-      localDate: date.toLocaleString(),
-      utcDate: date.toUTCString()
-    });
-  
-    return date;
-  };
+  // Note: In JavaScript, months are zero-based (0 = January, 11 = December)
+  const localDate = new Date(year, month - 1, day, hours, minutes, 0, 0);
+
+  // Debug logging to verify correctness
+  console.log('Time comparison:', {
+    input: `${dateStr} ${timeStr}`,
+    localDate: localDate.toLocaleString(),
+    utcDate: localDate.toUTCString()
+  });
+
+  return localDate;
+};
+
 
   // Initial appointments fetch
   const fetchAppointments = async () => {
@@ -80,44 +82,35 @@ const ViewMeetings = () => {
       setLoading(true);
       const appointmentsResponse = await apiService.getAppointmentsByUser(user.student_id);
   
-      // Split appointments into past and future
       const now = new Date();
-      console.log('Current time:', now.toLocaleString());
   
       const { past, future } = appointmentsResponse.reduce((acc, apt) => {
-        const appointmentDate = convertUTCToLocal(apt.date, apt.end_time);
-        
-        console.log('Comparing appointment:', {
-          id: apt.id,
-          date: apt.date,
-          endTime: apt.end_time,
-          localEndTime: appointmentDate.toLocaleString(),
-          isPast: appointmentDate < now
-        });
+        const aptDate = convertUTCToLocal(apt.date, apt.start_time);
   
-        if (appointmentDate < now) {
+        // Debug logging to verify categorization
+        console.log('Appointment ID:', apt.id, 'DateTime:', aptDate.toLocaleString());
+  
+        if (aptDate < now) {
           acc.past.push(apt);
         } else {
           acc.future.push(apt);
         }
-  
         return acc;
       }, { past: [], future: [] });
-
+  
       // Sorting Function
       const sortAppointments = (appointments, isPast = false) => {
         return appointments.sort((a, b) => {
-          // Parse start times as UTC for accurate comparison
           const dateA = convertUTCToLocal(a.date, a.start_time);
           const dateB = convertUTCToLocal(b.date, b.start_time);
           return isPast ? dateB - dateA : dateA - dateB;
         });
       };
-
+  
       // Get unique faculty IDs from both past and future appointments
       const uniqueFacultyIds = [...new Set([...past, ...future].map(apt => apt.faculty_id))];
       const facultyInfoMap = {};
-
+  
       // Fetch faculty info concurrently
       await Promise.all(
         uniqueFacultyIds.map(async (facultyId) => {
@@ -127,12 +120,23 @@ const ViewMeetings = () => {
           }
         })
       );
-
+  
       // Update state with sorted appointments and faculty info
       setFacultyInfo(facultyInfoMap);
       setPastAppointments(sortAppointments(past, true)); // Past appointments sorted reverse chronologically
       setAppointments(sortAppointments(future)); // Future appointments sorted chronologically
       setError(null);
+  
+      // Additional Debug Logging
+      console.log('Current Time:', now.toLocaleString());
+      console.log('Past Appointments:', past.map(apt => ({
+        id: apt.id,
+        dateTime: convertUTCToLocal(apt.date, apt.start_time).toLocaleString()
+      })));
+      console.log('Future Appointments:', future.map(apt => ({
+        id: apt.id,
+        dateTime: convertUTCToLocal(apt.date, apt.start_time).toLocaleString()
+      })));
     } catch (error) {
       console.error('Error fetching appointments:', error);
       setError('Failed to load appointments. Please try again.');
@@ -140,6 +144,7 @@ const ViewMeetings = () => {
       setLoading(false);
     }
   };
+  
 
   // Fetch scheduling data matching Schedule.jsx
   const fetchSchedulingData = async (facultyId) => {
@@ -466,14 +471,20 @@ const ViewMeetings = () => {
   };
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const today = new Date();
+    // Get today/tomorrow at midnight in the local timezone
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-
-    if (date.toDateString() === today.toDateString()) return 'Today';
-    if (date.toDateString() === tomorrow.toDateString()) return 'Tomorrow';
-
+  
+    // Get the appointment date at midnight in the local timezone
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day);  // month is 0-based in JS
+  
+    // Compare the dates (automatically compares timestamps)
+    if (date.getTime() === today.getTime()) return 'Today';
+    if (date.getTime() === tomorrow.getTime()) return 'Tomorrow';
+  
     return date.toLocaleDateString('en-US', {
       weekday: 'long',
       month: 'long',
@@ -485,13 +496,14 @@ const ViewMeetings = () => {
   const formatTime = (timeString) => {
     const [hours, minutes] = timeString.split(':').map(Number);
     const date = new Date();
-    date.setHours(hours, minutes);
+    date.setHours(hours, minutes); // Remove UTC conversion
     return date.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true
     });
   };
+  
 
   if (loading && !isReviewModalOpen) {
     return (
