@@ -9,7 +9,7 @@
     justify-content: center;
     align-items: center;
     padding: 1rem;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(12px);
     z-index: 1000;
     animation: modalFadeIn 0.3s ease-out;

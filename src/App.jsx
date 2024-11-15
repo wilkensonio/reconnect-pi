@@ -495,6 +495,10 @@ function AppRoutes() {
         <Routes location={location}>
             <Route
                 path="/"
+                element={<Navigate to="/login" replace />}
+            />
+            <Route
+                path="/"
                 element={
                     user ? <Navigate to="/select-faculty" replace /> : <Navigate to="/login" replace />
                 }
