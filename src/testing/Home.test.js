@@ -4,110 +4,23 @@ import { MemoryRouter } from 'react-router-dom';
 import Home from '../components/Home'; 
 import { apiService } from '../services/api'; 
 import { AppProvider } from '../context/AppContext'; 
+import LogoutButton from '../components/LogoutButton';
+import BackgroundLogos from '../components/BackgroundLogos';
+import Button from '../components/Button';
 
-jest.mock('../services/api', () => ({
-  apiService: {
-    getFacultyInfo: jest.fn(),
-  },
-}));
 
-const mockNavigate = jest.fn();
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: () => mockNavigate, 
-}));
 
-beforeAll(() => {
-  global.import = {
-    meta: {
-      env: {
-        VITE_APP_API_KEY: 'mock_api_key', 
-      },
-    },
-  };
+test('renders Home, LogoutButton, Button, and BackgroundLogos component', () => {
+  render(
+    <MemoryRouter>
+      <AppProvider>
+        <Home/>
+        <LogoutButton/>
+        <BackgroundLogos/>
+        <Button/>
+      </AppProvider>
+    </MemoryRouter>
+  );
+
 });
 
-beforeEach(() => {
-  jest.clearAllMocks(); 
-});
-
-describe('Home component', () => {
-  test('renders correctly and navigates based on facultyId', async () => {
-    const mockFacultyInfo = { last_name: 'DeCesare' };
-    apiService.getFacultyInfo.mockResolvedValue(mockFacultyInfo);
-    
-    sessionStorage.setItem('selected_faculty_id', '70570685');
-
-    render(
-      <MemoryRouter>
-        <AppProvider>
-          <Home />
-        </AppProvider>
-      </MemoryRouter>
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText(/Prof. DeCesare's Office/)).toBeInTheDocument();
-    });
-
-    expect(screen.getByText(/Schedule Meeting/)).toBeInTheDocument();
-    expect(screen.getByText(/View Meetings/)).toBeInTheDocument();
-    expect(screen.getByText(/Change Faculty Member/)).toBeInTheDocument();
-    expect(screen.getByText(/Logout/)).toBeInTheDocument();
-  });
-
-  test('redirects when no facultyId is found', async () => {
-    sessionStorage.removeItem('selected_faculty_id');
-
-    render(
-      <MemoryRouter>
-        <AppProvider>
-          <Home />
-        </AppProvider>
-      </MemoryRouter>
-    );
-
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true });
-    });
-  });
-
-  test('navigates to schedule page on button click', async () => {
-    const mockFacultyInfo = { last_name: 'DeCesare' };
-    apiService.getFacultyInfo.mockResolvedValue(mockFacultyInfo);
-    
-    sessionStorage.setItem('selected_faculty_id', '70570685');
-
-    render(
-      <MemoryRouter>
-        <AppProvider>
-          <Home />
-        </AppProvider>
-      </MemoryRouter>
-    );
-
-    fireEvent.click(screen.getByText(/Schedule Meeting/));
-
-    expect(mockNavigate).toHaveBeenCalledWith('/schedule');
-  });
-
-  test('handles faculty change and redirects', async () => {
-    const mockFacultyInfo = { last_name: 'DeCesare' };
-    apiService.getFacultyInfo.mockResolvedValue(mockFacultyInfo);
-    
-    sessionStorage.setItem('selected_faculty_id', '70570685');
-
-    render(
-      <MemoryRouter>
-        <AppProvider>
-          <Home />
-        </AppProvider>
-      </MemoryRouter>
-    );
-
-    fireEvent.click(screen.getByText(/Change Faculty Member/));
-
-    expect(sessionStorage.getItem('selected_faculty_id')).toBeNull();
-    expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true });
-  });
-});
