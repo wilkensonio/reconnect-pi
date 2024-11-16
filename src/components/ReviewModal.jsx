@@ -355,26 +355,32 @@ const ReviewModal = ({
           </>
         );
 
-      case 'duration':
-        return (
-          <>
-            <h2>Select Duration</h2>
-            <div className="edit-popup-content">
-              {meetingDurations.map((dur, index) => (
-                <div
-                  key={index}
-                  className="edit-option"
-                  onClick={() => {
-                    onUpdateDuration(dur);
-                    setEditField(null);
-                  }}
-                >
-                  {dur.label}
-                </div>
-              ))}
-            </div>
-          </>
-        );
+        case 'duration':
+          return (
+            <>
+              <h2>Select Duration</h2>
+              <div className="edit-popup-content">
+                {meetingDurations.length > 0 ? (
+                  meetingDurations.map((dur, index) => (
+                    <div
+                      key={index}
+                      className="edit-option"
+                      onClick={() => {
+                        onUpdateDuration(dur);
+                        setEditField(null);
+                      }}
+                    >
+                      {dur.label}
+                    </div>
+                  ))
+                ) : (
+                  <div className="no-times-message">
+                    No meeting times available
+                  </div>
+                )}
+              </div>
+            </>
+          );
 
         case 'reason':
           return (
