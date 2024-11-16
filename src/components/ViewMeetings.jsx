@@ -433,7 +433,7 @@ const convertUTCToLocal = (dateStr, timeStr) => {
   const handleCheckin = async (appointmentId) => {
     try {
       setCheckingInId(appointmentId);
-      await apiService.studentCheckin(appointmentId, 'checked in');
+      await apiService.studentCheckin(appointmentId);
       await fetchAppointments();
     } catch (error) {
       console.error('Error checking in:', error);
@@ -544,12 +544,6 @@ const convertUTCToLocal = (dateStr, timeStr) => {
               <div className="appointments-list">
                 {appointments.map((appointment) => (
                   <div key={appointment.id} className="appointment-item">
-                    {appointment.status === 'checked in' && (
-                      <div className="overlay">
-                        <span>Checked In</span>
-                      </div>
-                    )}
-                    <button onClick={() => handleCheckin(appointment.id)}>Check In</button>
                     <div className="appointment-info">
                       <div className="appointment-header">
 
