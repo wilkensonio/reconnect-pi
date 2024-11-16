@@ -1,7 +1,7 @@
 /* ViewMeetings.css */
 :root {
   --primary-blue: rgb(45, 85, 255);
-  --secondary-blue: rgb(25, 65, 220);
+  --secondary-blue: rgb(25, 65, 220) !important;
   --glass-bg: rgba(37, 99, 235, 0.4);
   --card-bg: rgba(255, 255, 255, 0.25);
   --success-green: #224ec5;
@@ -20,7 +20,7 @@
   align-items: center;
   min-height: 100vh;
   width: 100vw;
-  background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+  background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue) !important);
 }
 
 .meetings-container {
@@ -217,7 +217,20 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
-.back-button,
+.back-button {
+  width: 100%;
+  padding: 0.6rem;
+  border: none;
+  border-radius: var(--button-radius);
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  margin: 0;
+  background-color: var(--secondary-blue) !important;
+  color: white;
+}
 .logout-button {
   width: 100%;
   padding: 0.6rem;
@@ -232,7 +245,7 @@
 }
 
 .back-button {
-  background: var(--secondary-blue);
+  background: var(--secondary-blue) !important;
   color: white;
 }
 

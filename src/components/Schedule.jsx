@@ -80,7 +80,7 @@ const Schedule = () => {
         }
       } catch (error) {
         console.error('Error fetching data:', error);
-        setError('Failed to load data');
+        setError('No appointment times available. Please try again later.');
       }
     };
 

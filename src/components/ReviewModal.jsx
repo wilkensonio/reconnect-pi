@@ -376,25 +376,25 @@ const ReviewModal = ({
           </>
         );
 
-      case 'reason':
-        return (
-          <>
-            <h2>Select Reason</h2>
-            <div className="edit-popup-content">
-              {predefinedMessages.map((msg, index) => (
-                <div
-                  key={index}
-                  className="edit-option"
-                  onClick={() => {
-                    if (onUpdateReason) {
-                      onUpdateReason(msg);
-                    }
-                    setEditField(null);
-                  }}
-                >
-                  {msg.label}
-                  {reason === msg.label && <span className="selected-indicator"> ✓</span>}
-                </div>
+        case 'reason':
+          return (
+            <>
+              <h2>Select Reason</h2>
+              <div className="edit-popup-content">
+                {predefinedMessages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className="edit-option"
+                    onClick={() => {
+                      if (onUpdateReason) {
+                        onUpdateReason(msg.label);  // Pass label string instead of object
+                      }
+                      setEditField(null);
+                    }}
+                  >
+                    {msg.label}
+                    {reason === msg.label && <span className="selected-indicator"> ✓</span>}
+                  </div>
               ))}
             </div>
           </>
