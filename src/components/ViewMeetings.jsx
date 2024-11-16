@@ -544,6 +544,11 @@ const convertUTCToLocal = (dateStr, timeStr) => {
               <div className="appointments-list">
                 {appointments.map((appointment) => (
                   <div key={appointment.id} className="appointment-item">
+                    {appointment.status === 'checked in' && (
+                      <div className="overlay">
+                        <span>Checked In</span>
+                      </div>
+                    )}
                     <div className="appointment-info">
                       <div className="appointment-header">
 
