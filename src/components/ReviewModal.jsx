@@ -360,7 +360,7 @@ const ReviewModal = ({
             <>
               <h2>Select Duration</h2>
               <div className="edit-popup-content">
-                {meetingDurations.length > 0 ? (
+                {meetingDurations.length >= 0 ? (
                   meetingDurations.map((dur, index) => (
                     <div
                       key={index}
