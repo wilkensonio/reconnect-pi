@@ -549,6 +549,7 @@ const convertUTCToLocal = (dateStr, timeStr) => {
                         <span>Checked In</span>
                       </div>
                     )}
+                    <button onClick={() => handleCheckin(appointment.id)}>Check In</button>
                     <div className="appointment-info">
                       <div className="appointment-header">
 
