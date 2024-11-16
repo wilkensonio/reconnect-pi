@@ -433,7 +433,7 @@ const convertUTCToLocal = (dateStr, timeStr) => {
   const handleCheckin = async (appointmentId) => {
     try {
       setCheckingInId(appointmentId);
-      await apiService.studentCheckin(appointmentId);
+      await apiService.studentCheckin(appointmentId, 'checked in');
       await fetchAppointments();
     } catch (error) {
       console.error('Error checking in:', error);
