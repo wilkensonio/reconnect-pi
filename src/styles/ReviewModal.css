@@ -9,7 +9,7 @@
     justify-content: center;
     align-items: center;
     padding: 1rem;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(12px);
     z-index: 1000;
     animation: modalFadeIn 0.3s ease-out;
@@ -21,11 +21,12 @@
     display: contents;
 }
 
-.review-modal-content {
+.review-modal-card {
     background: linear-gradient(135deg, #3498db, #8e44ad);
     width: 90%;
     max-width: 700px;
     min-height: 380px;
+    max-height: 90vh;
     padding: 1rem 1rem 1rem !important;
     border-radius: 12px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
@@ -33,6 +34,15 @@
     flex-direction: column;
     animation: modalZoomIn 0.3s ease-out;
     opacity: 0.95;
+    overflow: hidden;
+}
+
+.review-modal-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: calc(90vh - 2rem);
+    overflow: hidden;
 }
 
 .review-modal-content h2 {
@@ -52,6 +62,7 @@
     outline: none !important;
     font-weight: 600;
 }
+
 .review-modal-content h2::before,
 .review-modal-content h2::after {
     display: none !important;
@@ -123,6 +134,8 @@
     gap: 0.75rem;
     margin-bottom: 1.25rem;
     overflow-y: auto;
+    padding-right: 1.5rem;
+    margin-right: -0.5rem;
 }
 
 .week-navigation {
@@ -131,6 +144,11 @@
     justify-content: space-between;
     gap: 1rem;
     margin-bottom: 0.75rem;
+    position: sticky;
+    top: 0;
+    background: inherit;
+    padding: 8px 0;
+    z-index: 1;
 }
 
 .week-label {
@@ -164,6 +182,10 @@
     justify-content: center;
     gap: 1rem;
     margin-top: auto;
+    padding-top: 1rem;
+    background: inherit;
+    position: sticky;
+    bottom: 0;
 }
 
 .review-modal-button {
@@ -214,6 +236,24 @@
 
 .review-modal-button:not([disabled]):active {
     transform: scale(0.95);
+}
+
+.edit-popup-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.edit-popup-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.edit-popup-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+.edit-popup-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
 }
 
 /* Animations */
@@ -315,3 +355,4 @@
 .edit-option.blocked:hover {
     background-color: rgba(255, 255, 255, 0.05) !important;
 }
+

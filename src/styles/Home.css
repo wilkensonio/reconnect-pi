@@ -43,13 +43,13 @@
   gap: 1rem;
 }
 
-.action-button {
-  background-color: rgba(59, 131, 246, 0.959);
-  color: white;
+/* Base button styles */
+.button-container button {
   padding: 1.2rem;
   font-size: 1.3rem;
   border: 1px solid navy;
   border-radius: 8px;
+  color: white;
   text-shadow:
     -1px -1px 0 navy,
     1px -1px 0 navy,
@@ -58,26 +58,41 @@
   transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
-.action-button:hover {
-  background-color: rgba(59, 130, 246, 1);
+/* Specific button styles with higher specificity */
+.button-container .action-button {
+  background-color: rgba(59, 131, 246, 0.959) !important;
+}
+
+.button-container .action-button:hover {
+  background-color: rgba(59, 130, 246, 1) !important;
   transform: translateY(-2px);
 }
 
-.change-faculty-button {
+.button-container .change-faculty-button {
   margin-top: 1rem;
-  background-color: rgba(100, 116, 139, 0.8);
+  background-color: rgba(100, 116, 139, 0.8) !important;
 }
 
-.logout-button {
+.button-container .change-faculty-button:hover {
+  background-color: rgba(100, 116, 139, 0.9) !important;
+  transform: translateY(-2px);
+}
+
+.button-container .logout-button {
   margin-top: 0.5rem;
-  background-color: rgba(239, 68, 68, 0.8);
+  background-color: rgba(239, 68, 68, 0.8) !important;
+}
+
+.button-container .logout-button:hover {
+  background-color: rgba(239, 68, 68, 0.9) !important;
+  transform: translateY(-2px);
 }
 
 @media (max-width: 768px) {
   .home-card {
     padding: 1.5rem;
   }
-
+  
   .faculty-header h2 {
     font-size: 2rem;
   }

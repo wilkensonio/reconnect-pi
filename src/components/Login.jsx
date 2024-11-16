@@ -12,6 +12,8 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [showKeypad, setShowKeypad] = useState(false);
   const keypadRef = useRef(null);
+  const barcodeBuffer = useRef('');
+  const barcodeTimeoutRef = useRef(null);
   const navigate = useNavigate();
   const { setUser, user } = useAppContext();
 
@@ -21,13 +23,60 @@ const Login = () => {
     }
   }, [user, navigate]);
 
-  const handleSubmit = async (e) => {
+  // Handle barcode scanner input
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      // Ignore keypress events if the keypad is shown
+      if (showKeypad) return;
+
+      // Ignore if the pressed key is not a number or Enter
+      if (!/^\d$/.test(event.key) && event.key !== 'Enter') return;
+
+      // Clear the timeout on each keypress
+      if (barcodeTimeoutRef.current) {
+        clearTimeout(barcodeTimeoutRef.current);
+      }
+
+      if (event.key === 'Enter') {
+        // If Enter is pressed and we have input, submit it
+        if (barcodeBuffer.current) {
+          setUserId(barcodeBuffer.current);
+          handleSubmit({ preventDefault: () => {} }, barcodeBuffer.current);
+          barcodeBuffer.current = '';
+        }
+      } else {
+        // Add the number to the buffer
+        barcodeBuffer.current += event.key;
+
+        // Set a timeout to clear the buffer if no keypress happens within 50ms
+        // This helps distinguish between barcode scanner (rapid input) and keyboard
+        barcodeTimeoutRef.current = setTimeout(() => {
+          barcodeBuffer.current = '';
+        }, 50);
+      }
+    };
+
+    // Add the event listener
+    window.addEventListener('keypress', handleKeyPress);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('keypress', handleKeyPress);
+      if (barcodeTimeoutRef.current) {
+        clearTimeout(barcodeTimeoutRef.current);
+      }
+    };
+  }, [showKeypad]);
+
+  const handleSubmit = async (e, barcodeInput = null) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
+    const submittedId = barcodeInput || userId;
+
     try {
-      const response = await apiService.kioskLogin(userId);
+      const response = await apiService.kioskLogin(submittedId);
       setUser({
         id: response.id,
         student_id: response.student_id,
