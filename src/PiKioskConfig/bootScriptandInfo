@@ -1,0 +1,140 @@
+
+"""The following is the kiosk script which requires Xorg/xserver, lightdm, xdotool, openbox and unclutter as dependancies. Also ensure permissions are correctly set for the
+user/group that runs the xserver, display, input/output, and the script itself.
+
+
+  GNU nano 7.2                        /etc/xdg/autostart/kiosk.desktop                                  
+[Desktop Entry]
+Type=Application
+Exec=/home/kiosk/kiosk.sh
+Hidden=false
+X-GNOME-Autostart-enabled=true
+Name=Kiosk Mode
+Comment=Start Chromium in kiosk mode
+
+  GNU nano 7.2                       /usr/share/xsessions/kiosk.desktop                                 
+[Desktop Entry]
+Name=Kiosk
+Comment=Start Chromium in kiosk mode
+Exec=/home/kiosk/kiosk.sh
+Type=Application
+
+  GNU nano 7.2                            /etc/lightdm/lightdm.conf                                     
+#
+# General configuration
+#
+# start-default-seat = True to always start one seat if none are defined in the configuration
+# greeter-user = User to run greeter as
+# minimum-display-number = Minimum display number to use for X servers
+# minimum-vt = First VT to run displays on
+# lock-memory = True to prevent memory from being paged to disk
+# user-authority-in-system-dir = True if session authority should be in the system location
+# guest-account-script = Script to be run to setup guest account
+# logind-check-graphical = True to on start seats that are marked as graphical by logind
+# log-directory = Directory to log information to
+# run-directory = Directory to put running state in
+# cache-directory = Directory to cache to
+# sessions-directory = Directory to find sessions
+# remote-sessions-directory = Directory to find remote sessions
+# greeters-directory = Directory to find greeters
+# backup-logs = True to move add a .old suffix to old log files when opening new ones
+# dbus-service = True if LightDM provides a D-Bus service to control it
+#
+[LightDM]
+#start-default-seat=true
+#greeter-user=lightdm
+#minimum-display-number=0
+#minimum-vt=7
+#lock-memory=true
+#user-authority-in-system-dir=false
+#guest-account-script=guest-account
+#logind-check-graphical=false
+#log-directory=/var/log/lightdm
+#run-directory=/var/run/lightdm
+#cache-directory=/var/cache/lightdm
+#sessions-directory=/usr/share/lightdm/sessions:/usr/share/xsessions:/usr/share/wayland-sessions
+#remote-sessions-directory=/usr/share/lightdm/remote-sessions
+#greeters-directory=$XDG_DATA_DIRS/lightdm/greeters:$XDG_DATA_DIRS/xgreeters
+#backup-logs=true
+#dbus-service=true
+
+#
+# Seat configuration
+#
+# Seat configuration is matched against the seat name glob in the section, for example:
+# [Seat:*] matches all seats and is applied first.
+# [Seat:seat0] matches the seat named "seat0".
+# [Seat:seat-thin-client*] matches all seats that have names that start with "seat-thin-client".
+
+# type = Seat type (local, xremote, unity)
+# pam-service = PAM service to use for login
+# pam-autologin-service = PAM service to use for autologin
+# pam-greeter-service = PAM service to use for greeters
+# xserver-backend = X backend to use (mir)
+#xserver-command =X -auth /var/run/lightdm/root/:0 
+# xmir-command = Xmir server command to run (can also contain arguments e.g. Xmir -special-option)
+# xserver-config = Config file to pass to X server
+# xserver-layout = Layout to pass to X server
+
+
+
+
+"""
+
+
+
+#!/bin/bash
+
+sudo iw dev wlan0 set power_save off
+
+sleep 1
+sudo iw dev wlan0 scan freq 5180 5200 5220 5240 5260 5280 5300 5320 5500
+sleep 1
+sudo iwconfig wlan0 freq 5.22G
+sleep 2
+sudo iwconfig wlan0 freq 5.5G
+
+export DISPLAY=:0
+export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u)/bus"
+export XDG_RUNTIME_DIR=/run/user/$(id -u)
+export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus" #is a duplicate from the first assignment, so either way could be utilized
+
+
+# grant access to Xserver
+xhost +SI:localuser:kiosk
+
+sleep 2
+
+xrandr --output HDMI-1 --mode 1920x1200 --scale 0.533x0.5 # only needed to scale since there were no options for native 1024x600, and no workaround to implement that on the display even with cvt and creating newmodes for the diplay device itself
+
+# Hide the mouse cursor
+xset s off # disable screen saver
+xset s noblank # disable screen blanking
+xset -dpms # disable dpms (energy star)
+unclutter --idle 1 --root --noevents &
+
+# Launch Chromium in kiosk mode
+chromium-browser \
+        --user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36" \
+        --noerrdialogs \
+        --disable-infobars \
+        --kiosk \
+        --no-sandbox \
+        --disable-gpu \
+        --disable-software-rasterizer \
+        --disable-extensions \
+        --disable-background-networking \
+        --disable-sync \
+        --disable-logging \
+        http://192.168.4.68:3000/ &
+
+while true; do
+  if ! curl -s --head http://192.168.4.68:3000/ > /dev/null; then
+    sleep 5  # Wait 5 seconds
+    if curl -s --head http://192.168.4.68:3000/ > /dev/null; then
+      # Server is back, refresh the page
+      xdotool key F5
+    fi
+  fi
+  sleep 5
+done

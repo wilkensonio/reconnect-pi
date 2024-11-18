@@ -32,7 +32,6 @@ const STATIC_ASSETS = [
     '/src/styles/Home.css',
     '/src/styles/Loading.css',
     '/src/styles/Login.css',
-    '/src/styles/PiMessageModal.css',
     '/src/styles/Schedule.css',
     '/src/styles/ViewMeetings.css',
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css'
