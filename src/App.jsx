@@ -448,20 +448,24 @@ function AppRoutes() {
 
     useEffect(() => {
         let mounted = true;
-        
         const checkForMessages = async () => {
             try {
                 const response = await apiService.getAllPiMessages();
-                
                 if (!mounted) return;
-                
                 if (response && Array.isArray(response) && response.length > 0) {
                     setMessages(prevMessages => {
+                        // Keep original comparison for deletion/expiry
                         if (JSON.stringify(prevMessages) !== JSON.stringify(response)) {
                             return response;
                         }
+                        // But also show messages if they exist
+                        if (response.length > 0) {
+                            setShowMessages(true);
+                        }
                         return prevMessages;
                     });
+                    // Ensure messages are shown if we have them
+                    setShowMessages(true);
                 } else {
                     setShowMessages(false);
                 }
@@ -472,16 +476,16 @@ function AppRoutes() {
                 if (mounted) setIsLoading(false);
             }
         };
-
+    
         checkForMessages();
-        const messageInterval = setInterval(checkForMessages, 1000);
+        const messageInterval = setInterval(checkForMessages, 500); // Changed to 500ms for faster updates
         
         return () => {
             mounted = false;
             clearInterval(messageInterval);
         };
     }, []);
-
+    
     if (isLoading) {
         return <Loading message="Loading..." />;
     }
