@@ -1,0 +1,68 @@
+name: deploy -> EC2
+
+on:
+  pull_request:
+    types: [closed] # Run on PR close (merge or reject)
+    branches:
+      - main
+
+permissions:
+  contents: read
+  id-token: write # Required for AWS authentication
+
+concurrency:
+  group: deploy-kiosk-app-to-ec2-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Pull Docker image
+        run: |
+          docker pull ${{ secrets.DOCKER_USERNAME }}/kiosk-app:latest
+
+      - name: SSH into EC2 and deploy
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+        run: |
+          echo "$SSH_PRIVATE_KEY" | base64 --decode > /tmp/ec2_key.pem
+          chmod 600 /tmp/ec2_key.pem
+
+          ssh -o StrictHostKeyChecking=no -i /tmp/ec2_key.pem ubuntu@ec2-3-82-206-23.compute-1.amazonaws.com << 'EOF'
+
+            # Add current user to docker group if not already a member
+            sudo usermod -aG docker $USER 
+
+            # Refresh the group membership in the current session
+            newgrp docker  
+
+            # Stop the existing Docker container if it exists
+            if [ "$(docker ps -q -f name=kiosk-app)" ]; then
+              echo "Stopping existing container kiosk-app..."
+              docker stop kiosk-app || echo "Failed to stop container kiosk-app."
+              docker rm kiosk-app || echo "Failed to remove container kiosk-app."
+            fi
+
+            # Pull the latest Docker image
+            docker pull "${{ secrets.DOCKER_USERNAME }}/kiosk-app:latest"
+
+            # Run the container with environment variables passed dynamically
+            docker run -d -m 1g -p 3000:80 --name kiosk-app "${{ secrets.DOCKER_USERNAME }}/kiosk-app:latest"
+
+            # Check logs for verification
+            docker logs kiosk-app
+
+          EOF
