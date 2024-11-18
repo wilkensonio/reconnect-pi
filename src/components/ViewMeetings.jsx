@@ -183,6 +183,7 @@ const convertUTCToLocal = (dateStr, timeStr) => {
   useEffect(() => {
     fetchAppointments();
   }, [user]);
+  
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -434,13 +435,19 @@ const convertUTCToLocal = (dateStr, timeStr) => {
     try {
       setCheckingInId(appointmentId);
       await apiService.studentCheckin(appointmentId);
-      await fetchAppointments();
+      setAppointments(appointments.map(apt => 
+        apt.id === appointmentId ? { ...apt, checked_in: true } : apt
+      ));
     } catch (error) {
       console.error('Error checking in:', error);
       setError('Failed to check in. Please try again.');
     } finally {
       setCheckingInId(null);
     }
+  };
+
+  const getAppointmentClassName = (appointment) => {
+    return `appointment-item ${appointment.checked_in ? 'checked-in' : ''}`;
   };
 
   const resetSchedulingState = () => {
@@ -543,7 +550,7 @@ const convertUTCToLocal = (dateStr, timeStr) => {
             ) : (
               <div className="appointments-list">
                 {appointments.map((appointment) => (
-                  <div key={appointment.id} className="appointment-item">
+                  <div key={appointment.id} className={getAppointmentClassName(appointment)}>
                     <div className="appointment-info">
                       <div className="appointment-header">
 

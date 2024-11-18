@@ -417,3 +417,32 @@ button:disabled {
     font-size: 0.8rem !important;
   }
 }
+
+.appointment-item.checked-in {
+  position: relative;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.appointment-item.checked-in::before {
+  content: "✓ CHECKED IN";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--success-green);
+  padding: 0.5rem 1rem;
+  border-radius: var(--button-radius);
+  font-weight: bold;
+  font-size: 1.2rem;
+  z-index: 2;
+}
+
+.appointment-item.checked-in .appointment-info,
+.appointment-item.checked-in .button-group-apt {
+  opacity: 0.5;
+}
+
+.appointment-item.checked-in:hover {
+  transform: none;
+  box-shadow: none;
+}
