@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';  
 import { MemoryRouter } from 'react-router-dom';
 import Schedule from '../components/Schedule';
-import { AppProvider } from '../context/AppContext'; // Adjust the import path as necessary
+import { AppProvider } from '../context/AppContext'; 
 import logoSrc from '/rcnnct.png';
 
 beforeAll(() => {

@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import ReviewModal from '../components/ReviewModal';
-import { AppProvider } from '../context/AppContext'; // Adjust the import path as necessary
+import { AppProvider } from '../context/AppContext'; 
 
 beforeAll(() => {
   global.import = {
@@ -14,7 +14,7 @@ beforeAll(() => {
   };
 });
 
-test('renders ViewMeetings component', () => {
+test('Renders ViewMeetings Component', () => {
   render(
     <MemoryRouter>
       <AppProvider>
