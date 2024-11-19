@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Suspense } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { AppProvider, useAppContext } from './context/AppContext';
 import { apiService } from './services/api';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -410,7 +410,9 @@ function AppRoutes() {
     const [showMessages, setShowMessages] = useState(true);
     const [messages, setMessages] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [stopChecking, setStopChecking] = useState(false);
     const location = useLocation();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const preserveStorage = () => {
@@ -448,31 +450,38 @@ function AppRoutes() {
 
     useEffect(() => {
         let mounted = true;
-        
+
+        if (stopChecking) return;
+
         const checkForMessages = async () => {
             try {
                 const response = await apiService.getAllPiMessages();
-                
-                if (!mounted) return;
+                if (!mounted || stopChecking) return;
                 
                 if (response && Array.isArray(response) && response.length > 0) {
                     setMessages(prevMessages => {
+                        // Keep original comparison for deletion/expiry
                         if (JSON.stringify(prevMessages) !== JSON.stringify(response)) {
+                            setShowMessages(true);  // Only set true when messages actually change
                             return response;
                         }
                         return prevMessages;
                     });
                 } else {
+                    setMessages([]);
                     setShowMessages(false);
                 }
             } catch (error) {
                 console.error('Error checking messages:', error);
-                if (mounted) setShowMessages(false);
+                if (mounted) {
+                    setMessages([]);
+                    setShowMessages(false);
+                }
             } finally {
                 if (mounted) setIsLoading(false);
             }
         };
-
+    
         checkForMessages();
         const messageInterval = setInterval(checkForMessages, 1000);
         
@@ -480,7 +489,7 @@ function AppRoutes() {
             mounted = false;
             clearInterval(messageInterval);
         };
-    }, []);
+    }, [stopChecking]);
 
     if (isLoading) {
         return <Loading message="Loading..." />;
@@ -489,7 +498,14 @@ function AppRoutes() {
     const mainContent = showMessages && messages.length > 0 ? (
         <PiMessageModal 
             messages={messages} 
-            onClose={() => setShowMessages(false)}
+            onClose={() => {
+                setStopChecking(true);
+                setShowMessages(false);
+                setMessages([]);
+                if (!user) {
+                    navigate('/login');
+                }
+            }}
         />
     ) : (
         <Routes location={location}>
