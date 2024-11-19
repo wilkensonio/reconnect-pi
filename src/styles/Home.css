@@ -70,11 +70,11 @@
 
 .button-container .change-faculty-button {
   margin-top: 1rem;
-  background-color: rgba(100, 116, 139, 0.8) !important;
+  background-color: rgba(42, 60, 219, 0.8) !important;
 }
 
 .button-container .change-faculty-button:hover {
-  background-color: rgba(100, 116, 139, 0.9) !important;
+  background-color: rgba(24, 66, 124, 0.9) !important;
   transform: translateY(-2px);
 }
 
