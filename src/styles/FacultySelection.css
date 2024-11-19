@@ -177,3 +177,25 @@
       grid-template-columns: 1fr;
     }
   }
+
+  .logout-button-container {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+   }
+   
+   .logout-button {
+    color: white;
+    border: none;
+    padding: 6px 6px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+   }
+   
+   .logout-button:hover {
+    background: rgba(59, 131, 246, 1);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+   }

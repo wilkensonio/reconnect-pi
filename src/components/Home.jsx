@@ -61,7 +61,7 @@ const Home = () => {
               onClick={() => handleNavigation('/view')}
               className="action-button"
             >
-              View Meetings
+              View Meetings -- Check-In
             </Button>
             <Button 
               onClick={handleChangeFaculty}

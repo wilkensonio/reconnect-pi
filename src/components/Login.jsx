@@ -193,6 +193,14 @@ const Login = () => {
                 </div>
                 {error && <p className="error-message">{error}</p>}
               </form>
+              <div className="scan-box">
+              <span className="arrow-down">
+                <svg width="24" height="24" viewBox="0 0 24 24">
+                  <path d="M12 16l-6-6h12z" fill="#ffffff"/>
+                </svg>
+              </span>
+              Scan Here!
+            </div>
             </div>
           </div>
         </div>
@@ -261,6 +269,7 @@ const Login = () => {
         )}
       </div>
     </div>
+    
   );
 };
 

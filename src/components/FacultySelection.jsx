@@ -16,6 +16,7 @@ const FacultySelection = () => {
   const location = useLocation();
   const { user } = useAppContext();
 
+
   useEffect(() => {
     const fetchFaculty = async () => {
       try {
@@ -88,6 +89,9 @@ const FacultySelection = () => {
       <BackgroundLogos logoSrc={logoSrc} />
       <div className="faculty-selection-container">
         <div className="faculty-card">
+          <div className="logout-button-container">
+            <LogoutButton />
+          </div>
           <h2>Select a Faculty Member</h2>
           {faculty.length > 0 ? (
             <div className="faculty-grid">
