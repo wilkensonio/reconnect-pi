@@ -8,8 +8,17 @@ import LogoutButton from '../components/LogoutButton';
 import BackgroundLogos from '../components/BackgroundLogos';
 import Button from '../components/Button';
 
-
-
+// Mocking API Key
+beforeAll(() => {
+  global.import = {
+    meta: {
+      env: {
+        VITE_APP_API_KEY: 'mock_api_key', 
+      },
+    },
+  };
+});
+// Test to ensure that all components render correctly without errors
 test('renders Home, LogoutButton, Button, and BackgroundLogos component', () => {
   render(
     <MemoryRouter>

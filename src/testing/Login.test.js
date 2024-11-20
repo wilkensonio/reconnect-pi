@@ -1,9 +1,11 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import Login from '../components/Login';
+import { apiService } from '../services/api';
 import { MemoryRouter } from 'react-router-dom';
-import ReviewModal from '../components/ReviewModal';
 import { AppProvider } from '../context/AppContext'; 
 
+// Mock API key for testing purposes
 beforeAll(() => {
   global.import = {
     meta: {
@@ -14,11 +16,12 @@ beforeAll(() => {
   };
 });
 
-test('Renders ReviewModal Component', () => {
+// Test case to ensure the Login component renders correctly
+test('Renders Login Component', () => {
   render(
     <MemoryRouter>
       <AppProvider>
-        <ReviewModal />
+        <Login />
       </AppProvider>
     </MemoryRouter>
   );

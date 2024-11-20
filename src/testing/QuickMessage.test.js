@@ -1,9 +1,8 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import QuickMessage from '../components/QuickMessage';
-import { apiService } from '../services/api';
 import { MemoryRouter } from 'react-router-dom';
-import { AppProvider } from '../context/AppContext'; 
+import { AppProvider } from '../context/AppContext';
 
 beforeAll(() => {
   global.import = {
@@ -15,16 +14,12 @@ beforeAll(() => {
   };
 });
 
+test('Renders QuickMessage Component', () => {
 
-jest.mock('../services/api', () => ({
-  sendQuickMessage: jest.fn(),
-}));
-
-test('Renders ViewMeetings Component', () => {
   render(
     <MemoryRouter>
       <AppProvider>
-        <QuickMessage />
+        <QuickMessage/>
       </AppProvider>
     </MemoryRouter>
   );

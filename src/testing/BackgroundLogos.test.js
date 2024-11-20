@@ -4,6 +4,7 @@ import BackgroundLogos from '../components/BackgroundLogos';
 import useBackgroundLogos from '../hooks/useBackgroundLogos';
 import '@testing-library/jest-dom';
 
+// Mock the hook to control its return values during the test
 jest.mock('../hooks/useBackgroundLogos');
 
 describe('BackgroundLogos Component', () => {
@@ -16,11 +17,13 @@ describe('BackgroundLogos Component', () => {
   beforeEach(() => {
     useBackgroundLogos.mockReturnValue(mockLogos);
   });
-
+  
+  // Clear all mocks after each test to ensure no test interference
   afterEach(() => {
     jest.clearAllMocks();
   });
 
+  // Test if the correct number of logo elements are rendered
   it('renders the correct number of logos', () => {
     render(<BackgroundLogos logoSrc={logoSrc} />);
 
@@ -28,11 +31,13 @@ describe('BackgroundLogos Component', () => {
     expect(renderedLogos).toHaveLength(mockLogos.length);
   });
 
+  // Test if the correct styles are applied to each logo element
   it('applies the correct styles to each logo', () => {
     render(<BackgroundLogos logoSrc={logoSrc} />);
 
     const renderedLogos = screen.getAllByAltText('background-logo');
 
+    // Loop through each logo and verify its style matches the mock data
     renderedLogos.forEach((logo, index) => {
       expect(logo).toHaveStyle(`width: ${mockLogos[index].size}px`);
       expect(logo).toHaveStyle(`top: ${mockLogos[index].top}%`);
@@ -42,6 +47,7 @@ describe('BackgroundLogos Component', () => {
     });
   });
 
+    // Test if the correct image source is applied to each logo
   it('applies the correct src to each logo', () => {
     render(<BackgroundLogos logoSrc={logoSrc} />);
 

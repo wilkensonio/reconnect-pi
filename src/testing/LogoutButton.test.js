@@ -6,6 +6,7 @@ import { apiService } from '../services/api';
 import { useAppContext } from '../context/AppContext';
 import '@testing-library/jest-dom';
 
+// Mock the API key for testing
 beforeAll(() => {
   global.import = {
     meta: {
@@ -16,20 +17,24 @@ beforeAll(() => {
   };
 });
 
+// Mock the apiService.logout method to control its behavior during tests
 jest.mock('../services/api', () => ({
   apiService: {
     logout: jest.fn(),
   },
 }));
 
+// Mock the useAppContext hook to control the context state and actions
 jest.mock('../context/AppContext', () => ({
   useAppContext: jest.fn(),
 }));
 
+// Mock the Button component used inside the LogoutButton to simplify testing
 jest.mock('../components/Button', () => ({ onClick, className, children }) => (
   <button onClick={onClick} className={className}>{children}</button>
 ));
 
+// Mock react-router-dom's useNavigate function to test navigation
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: jest.fn(),
