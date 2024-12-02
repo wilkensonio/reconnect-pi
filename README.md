@@ -93,32 +93,32 @@ npm run preview
 
 App.jsx
 
-: Main application component with routing and context providers.
+Main application component with routing and context providers.
 - 
 
 components
 
-: Reusable components like `Login`, `Schedule`, `Home`, `ErrorBoundary`, etc.
+Reusable components like `Login`, `Schedule`, `Home`, `ErrorBoundary`, etc.
 - 
 
 context
 
-: Context providers for global state management.
+Context providers for global state management.
 - 
 
 services
 
-: API services for handling HTTP requests.
+API services for handling HTTP requests.
 - 
 
 styles
 
-: CSS files and styling for the components.
+CSS files and styling for the components.
 - 
 
 public
 
-: Static assets like images and HTML templates.
+Static assets like images and HTML templates.
 
 ## Available Scripts
 
